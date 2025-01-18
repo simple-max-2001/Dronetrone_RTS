@@ -1,0 +1,191 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "RTSPlayerController.h"
+#include "GameFramework/Pawn.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Engine/World.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+
+#include "CameraPawn.h"
+
+ARTSPlayerController::ARTSPlayerController()
+{
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+
+	bShouldPerformFullTickWhenPaused = true;
+	PrimaryActorTick.bTickEvenWhenPaused = true;
+}
+
+void ARTSPlayerController::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+
+	if (APlayerController* PC = Cast<APlayerController>(this))
+	{
+
+		//Add Input Mapping Context
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
+		{
+			if (MappingContext)
+			{
+				Subsystem->AddMappingContext(MappingContext, 0);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("MappingContext is null!"));
+			}
+		}
+	}
+}
+
+void ARTSPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	EdgeScroll();
+}
+
+void ARTSPlayerController::SetupInputComponent()
+{
+	// set up gameplay key bindings
+	Super::SetupInputComponent();
+	UE_LOG(LogTemp, Log, TEXT("SetupInputComponent"));
+
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+	{
+		if (MoveCameraAction)
+		{
+			EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnMoveCamera);
+			EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Started, this, &ARTSPlayerController::SetDisableEdgeScroll, true);
+			EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Completed, this, &ARTSPlayerController::SetDisableEdgeScroll, false);
+			EnhancedInputComponent->BindAction(MoveCameraAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::SetDisableEdgeScroll, false);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("MoveCameraAction is null!"));
+
+		if (ZoomCameraAction) EnhancedInputComponent->BindAction(ZoomCameraAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnZoomCamera);
+		else UE_LOG(LogTemp, Warning, TEXT("ZoomCameraAction is null!"));
+
+		if (PanCameraAction)
+		{
+			EnhancedInputComponent->BindAction(PanCameraAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnPanCamera);
+			EnhancedInputComponent->BindAction(PanCameraAction, ETriggerEvent::Started, this, &ARTSPlayerController::SetDisableEdgeScroll, true);
+			EnhancedInputComponent->BindAction(PanCameraAction, ETriggerEvent::Completed, this, &ARTSPlayerController::SetDisableEdgeScroll, false);
+			EnhancedInputComponent->BindAction(PanCameraAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::SetDisableEdgeScroll, false);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("PanCameraAction is null!"));
+
+		if (SpeedUpAction)
+		{
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSpeedUp, true);
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSpeedUp, false);
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSpeedUp, false);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("SpeedUpAction is null!"));
+
+		//// Setup mouse input events
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnSetDestinationTriggered);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSetDestinationReleased);
+		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSetDestinationReleased);
+
+		//// Setup touch input events
+		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
+		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnTouchTriggered);
+		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnTouchReleased);
+		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnTouchReleased);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnhancedInputComponent not checked"));
+	}
+}
+
+void ARTSPlayerController::OnMoveCamera(const FInputActionInstance& Instance)
+{
+	if (bDisableCameraMovement) return;
+
+	//UE_LOG(LogTemp, Log, TEXT("OnMoveCamera"));
+	FVector2D axes = Instance.GetValue().Get<FVector2D>();
+	ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
+	pawn->MovePawn(axes.X, axes.Y);
+}
+
+void ARTSPlayerController::OnZoomCamera(const FInputActionInstance& Instance)
+{
+	//UE_LOG(LogTemp, Log, TEXT("OnZoomCamera"));
+	float axis = Instance.GetValue().Get<float>();
+	ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
+	pawn->ChangeZoom(axis);
+}
+
+void ARTSPlayerController::OnPanCamera()
+{
+	float axis_x, axis_y;
+	int32 size_x, size_y;
+
+	GetInputMouseDelta(axis_x, axis_y);
+	GetViewportSize(size_x, size_y);
+
+	axis_x /= size_x;
+	axis_y /= size_y;
+
+	//UE_LOG(LogTemp, Log, TEXT("OnPanCamera: %.5f, %.5f"), axis_x, axis_y);
+	ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
+	pawn->PanCamera(axis_x, axis_y);
+}
+
+void ARTSPlayerController::OnSpeedUp(bool speed_up)
+{
+	ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
+	pawn->SetSpeedUp(speed_up);
+}
+
+void ARTSPlayerController::EdgeScroll()
+{
+	if (bDisableEdgeScroll) return;
+
+	float axis_x = .0f, axis_y = .0f;
+
+	float mouse_x, mouse_y;
+	int32 size_x, size_y;
+
+	GetMousePosition(mouse_x, mouse_y);
+	GetViewportSize(size_x, size_y);
+
+	mouse_x /= size_x;
+	mouse_y /= size_y;
+
+	if (mouse_x < EdgeScrollBorder) axis_y = -1.f;
+	else if (mouse_x > 1 - EdgeScrollBorder) axis_y = 1.f;
+
+	if (mouse_y < EdgeScrollBorder) axis_x = 1.f;
+	else if (mouse_y > 1 - EdgeScrollBorder) axis_x = -1.f;
+
+	if (axis_x != .0f || axis_y != .0f)
+	{
+		SetDisableCameraMovement(true);
+
+		ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
+		pawn->MovePawn(axis_x, axis_y);
+	}
+	else
+	{
+		SetDisableCameraMovement(false);
+	}
+}
+
+void ARTSPlayerController::SetDisableCameraMovement(bool bInDisableCameraMovement)
+{
+	bDisableCameraMovement = bInDisableCameraMovement;
+}
+
+void ARTSPlayerController::SetDisableEdgeScroll(bool bInDisableEdgeScroll)
+{
+	bDisableEdgeScroll = bInDisableEdgeScroll;
+}
