@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "RTSUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Landscape.h"
-#include "RTSUtils.h"
 
 ALevelManager* URTSUtils::GetLevelManager(const UWorld* world)
 {

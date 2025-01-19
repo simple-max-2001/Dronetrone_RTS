@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "DrawDebugHelpers.h"
 #include "LevelManager.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ALevelManager::ALevelManager()
