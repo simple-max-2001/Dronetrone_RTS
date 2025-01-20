@@ -29,7 +29,10 @@ void UEntityComponent::BeginPlay()
 
 void UEntityComponent::KillEntity()
 {
-	// Change status
+	// What is dead cannot die again
+	if (!bIsAlive) return;
+
+	// Change is alive to dead
 	bIsAlive = false;
 
 	if (OnDieEntity.IsBound()) OnDieEntity.Broadcast();
@@ -44,7 +47,7 @@ void UEntityComponent::DestroyEntity()
 	AActor* Owner = GetOwner();
 	if (IsValid(Owner))
 	{
-		Owner->Destroy(); // Актор буде знищено через 2 секунди
+		Owner->Destroy(); // Destroy unit
 	}
 }
 
