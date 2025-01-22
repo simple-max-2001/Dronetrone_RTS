@@ -3,13 +3,12 @@
 #include "RTSPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
 #include "CameraPawn.h"
+#include "RTSGameState.h"
 
 ARTSPlayerController::ARTSPlayerController()
 {
@@ -82,11 +81,17 @@ void ARTSPlayerController::SetupInputComponent()
 
 		if (SpeedUpAction)
 		{
-			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSpeedUp, true);
-			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSpeedUp, false);
-			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSpeedUp, false);
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSpeedUpCamera, true);
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSpeedUpCamera, false);
+			EnhancedInputComponent->BindAction(SpeedUpAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSpeedUpCamera, false);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("SpeedUpAction is null!"));
+
+		if (PauseAction)
+		{
+			EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSwitchPause);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("PauseAction is null!"));
 
 		//// Setup mouse input events
 		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
@@ -140,10 +145,21 @@ void ARTSPlayerController::OnPanCamera()
 	pawn->PanCamera(axis_x, axis_y);
 }
 
-void ARTSPlayerController::OnSpeedUp(bool speed_up)
+void ARTSPlayerController::OnSpeedUpCamera(bool speed_up)
 {
 	ACameraPawn* pawn = Cast<ACameraPawn>(GetPawn());
 	pawn->SetSpeedUp(speed_up);
+}
+
+void ARTSPlayerController::OnSwitchPause()
+{
+	ARTSGameState* game_state = Cast<ARTSGameState>(GetWorld()->GetGameState());
+
+	game_state->ServerSetPause(!game_state->bIsGamePaused);
+}
+
+void ARTSPlayerController::OnSetDestination()
+{
 }
 
 void ARTSPlayerController::EdgeScroll()

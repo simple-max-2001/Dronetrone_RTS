@@ -2,6 +2,7 @@
 
 #include "RTSGameMode.h"
 #include "RTSPlayerController.h"
+#include "RTSGameState.h"
 #include "CameraPawn.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -25,15 +26,7 @@ ARTSGameMode::ARTSGameMode()
 		UE_LOG(LogTemp, Warning, TEXT("PlayerControllerBPClass is null!"));
 	}
 
-	//static ConstructorHelpers::FClassFinder<ACameraPawn> PawnBPClass(TEXT("/Game/RTS/Player/BP_CameraPawn"));
-	//if (PawnBPClass.Class != nullptr)
-	//{
-	//	DefaultPawnClass = PawnBPClass.Class;
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("PawnBPClass is null!"));
-	//}
+	GameStateClass = ARTSGameState::StaticClass();
 }
 
 void ARTSGameMode::BeginPlay()

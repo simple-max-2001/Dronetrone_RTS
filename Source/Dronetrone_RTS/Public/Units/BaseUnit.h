@@ -3,10 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/DecalComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Pawn.h"
+
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
 #include "Physics/FastPhysicsEngine.h"
+
 #include "BaseUnit.generated.h"
 
 UCLASS()
@@ -23,6 +27,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UBoxComponent* BoxComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UEntityComponent* EntityComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -30,6 +37,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UFastPhysicsEngine* FastPhysicsEngine;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UDecalComponent* SelectionComponent;
 
 public:	
 	// Called every frame

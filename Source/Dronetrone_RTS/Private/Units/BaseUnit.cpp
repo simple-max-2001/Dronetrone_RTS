@@ -8,6 +8,13 @@ ABaseUnit::ABaseUnit()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent->SetSimulatePhysics(false);
+	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BoxComponent->SetCollisionProfileName(FName("Pawn"));
+
+	SetRootComponent(BoxComponent);
+
 	EntityComponent = CreateDefaultSubobject<UEntityComponent>(TEXT("EntityComponent"));
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
@@ -15,15 +22,10 @@ ABaseUnit::ABaseUnit()
 	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
 	FastPhysicsEngine->SetAutoActivate(true);
 
-
 	HealthComponent->OnHealthZero.AddDynamic(EntityComponent, &UEntityComponent::KillEntity);//.OnHealthZero.AddDynamic();
 
-	UPrimitiveComponent* RootComp = Cast<UPrimitiveComponent>(GetRootComponent());
-	if (RootComp)
-	{
-		RootComp->SetSimulatePhysics(false);
-		RootComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);  // ��������� ����� ������ �� ���糿
-	}
+	SelectionComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionComponent"));
+	SelectionComponent->SetupAttachment(RootComponent);
 
 	SetCanAffectNavigationGeneration(false);
 }

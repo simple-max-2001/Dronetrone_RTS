@@ -40,6 +40,18 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SpeedUpAction;
 
+	/* Pause Input Action */
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PauseAction;
+
+	/* Select Input Action */
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SelectAction;
+	
+	/* Set destination Input Action */
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SetDestinationAction;
+
 	/* Camera Pan Input Action */
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float EdgeScrollBorder = .05f;
@@ -58,11 +70,16 @@ protected:
 
 	void EdgeScroll();
 
-	/** Input handlers for SetDestination action. */
+	/* Input handlers for camera movement actions */
+
 	void OnMoveCamera(const FInputActionInstance& Instance);
 	void OnZoomCamera(const FInputActionInstance& Instance);
 	void OnPanCamera();
-	void OnSpeedUp(bool speed_up);
+	void OnSpeedUpCamera(bool speed_up);
+
+	void OnSwitchPause();
+
+	void OnSetDestination();
 
 	void SetDisableCameraMovement(bool bInDisableCameraMovement);
 	void SetDisableEdgeScroll(bool bInDisableEdgeScroll);
