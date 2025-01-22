@@ -70,16 +70,16 @@ public:
 	FOnHealthZero OnHealthZero;
 
 protected:
-	UPROPERTY(BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float Health = 100;
 
-	UPROPERTY(BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float MaxHealth = 100;
 
-	UPROPERTY(BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	EArmorType Armor = EArmorType::LIGHT;
 
-	UPROPERTY(BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	bool bIsImmortar = false;
 		
 };

@@ -9,10 +9,21 @@ ABaseUnit::ABaseUnit()
 	PrimaryActorTick.bCanEverTick = true;
 
 	EntityComponent = CreateDefaultSubobject<UEntityComponent>(TEXT("EntityComponent"));
+	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	
+	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
+	FastPhysicsEngine->SetAutoActivate(true);
 
-	//HealthComponent->OnHealthZero.AddDynamic(this, &UEntityComponent::KillEntity);//.OnHealthZero.AddDynamic();
+
 	HealthComponent->OnHealthZero.AddDynamic(EntityComponent, &UEntityComponent::KillEntity);//.OnHealthZero.AddDynamic();
+
+	UPrimitiveComponent* RootComp = Cast<UPrimitiveComponent>(GetRootComponent());
+	if (RootComp)
+	{
+		RootComp->SetSimulatePhysics(false);
+		RootComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);  // ��������� ����� ������ �� ���糿
+	}
 
 	SetCanAffectNavigationGeneration(false);
 }

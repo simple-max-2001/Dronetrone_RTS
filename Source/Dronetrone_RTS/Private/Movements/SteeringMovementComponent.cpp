@@ -2,28 +2,33 @@
 
 
 #include "Movements/SteeringMovementComponent.h"
+#include "Physics/FastPhysicsEngine.h"
 
 void USteeringMovementComponent::RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed)
 {
-    if (!UpdatedComponent)
-    {
-        return;
-    }
+    if (!UpdatedComponent) return;
+
+    UFastPhysicsEngine* fpe = GetOwner()->FindComponentByClass<UFastPhysicsEngine>();
 
     FVector ForwardVector = UpdatedComponent->GetForwardVector().GetSafeNormal();
     FVector DesiredVelocity = MoveVelocity.GetSafeNormal();
 
-    // Обчислення повороту (перехід до потрібного напрямку)
     float ForwardDot = FVector::DotProduct(ForwardVector, DesiredVelocity);
     float RightDot = FVector::CrossProduct(ForwardVector, DesiredVelocity).Z;
 
-    // Рух вперед або назад
+    // Calculate movement vector and yawrate
     FVector MoveInput = ForwardVector * ForwardDot * ForwardSpeed * (bForceMaxSpeed ? 1.f : .5f);
+    float YawRate = RightDot * RotationSpeed;
 
-    // Обчислення кута повороту
-    FRotator RotationDelta = FRotator(0, RightDot * RotationSpeed * GetWorld()->DeltaTimeSeconds, 0);
 
-    // Виконуємо переміщення та поворот
-    MoveUpdatedComponent(MoveInput * GetWorld()->DeltaTimeSeconds, UpdatedComponent->GetComponentRotation() + RotationDelta, true);
-
+    if (fpe)
+    {
+        fpe->SetDesiredVelocity(MoveInput);
+        fpe->SetDesiredYawRate(YawRate);
+    }
+    else
+    {
+        FRotator RotationDelta = FRotator(0, YawRate * GetWorld()->DeltaTimeSeconds, 0);
+        MoveUpdatedComponent(MoveInput * GetWorld()->DeltaTimeSeconds, UpdatedComponent->GetComponentRotation() + FRotator(0, YawRate * GetWorld()->DeltaTimeSeconds, 0), true);
+    }
 }

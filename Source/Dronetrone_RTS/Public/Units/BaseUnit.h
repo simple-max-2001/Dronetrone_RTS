@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
+#include "Physics/FastPhysicsEngine.h"
 #include "BaseUnit.generated.h"
 
 UCLASS()
@@ -26,6 +27,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UFastPhysicsEngine* FastPhysicsEngine;
 
 public:	
 	// Called every frame

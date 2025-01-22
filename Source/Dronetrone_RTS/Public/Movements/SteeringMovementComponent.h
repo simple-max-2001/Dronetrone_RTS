@@ -20,8 +20,8 @@ public:
 protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering Movement")
-    float ForwardSpeed = 300.0f;
+    float ForwardSpeed = 500.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Steering Movement")
-    float RotationSpeed = 100.0f;
+    float RotationSpeed = 180.0f;
 };
