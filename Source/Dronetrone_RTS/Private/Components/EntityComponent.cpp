@@ -64,3 +64,8 @@ bool UEntityComponent::IsAlive()
 	return bIsAlive;
 }
 
+EOwnership UEntityComponent::GetOwnerID()
+{
+	return OwnerID;
+}
+

@@ -16,4 +16,6 @@ public:
 
 protected:
 	virtual void BeginPlay();
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 };

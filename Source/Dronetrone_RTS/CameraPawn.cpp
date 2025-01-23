@@ -4,7 +4,7 @@
 #include "CameraPawn.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
-#include "RTSUtils.h"
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -51,7 +51,7 @@ void ACameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	LevelManager = URTSUtils::GetLevelManager(GetWorld());
+	LevelManager = Cast<ALevelManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ALevelManager::StaticClass()));
 
 	if (LevelManager)
 	{

@@ -7,6 +7,9 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
+
+#include "RTSGameState.h"
+
 #include "RTSPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */
@@ -60,6 +63,8 @@ public:
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	//class UInputAction* SetDestinationTouchAction;
 
+	void SetPlayerInfo(FPlayerInfo* player_info);
+
 protected:
 	virtual void SetupInputComponent() override;
 	
@@ -87,6 +92,8 @@ protected:
 private:
 	bool bDisableCameraMovement = false;
 	bool bDisableEdgeScroll = false;
+
+	FPlayerInfo* PlayerInfo;
 
 };
 

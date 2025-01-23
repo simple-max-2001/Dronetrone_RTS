@@ -42,4 +42,25 @@ void ARTSGameMode::BeginPlay()
 	}*/
 }
 
+void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	ARTSGameState* GameState_ = GetGameState<ARTSGameState>();
+	if (GameState_)
+	{
+		int32 PlayerIndex = GetNumPlayers() - 1; // Отримати індекс нового гравця
+		FPlayerInfo* PlayerInfo = GameState_->GetPlayerInfo();
+
+		if (PlayerInfo)
+		{
+			ARTSPlayerController* PC = Cast<ARTSPlayerController>(NewPlayer);
+			if (PC)
+			{
+				PC->SetPlayerInfo(PlayerInfo);
+			}
+		}
+	}
+}
+
 

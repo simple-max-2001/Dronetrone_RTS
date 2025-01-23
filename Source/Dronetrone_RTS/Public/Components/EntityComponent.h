@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
+
+#include "RTSTypes.h"
+
 #include "EntityComponent.generated.h"
 
-class UEntityComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSpawnEntity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieEntity);
@@ -39,6 +41,10 @@ public:
 	FDieEntity OnDestroyEntity;
 
 protected:
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Entity|Ownership")
+	EOwnership OwnerID = EOwnership::NEUTRAL;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -46,10 +52,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	EOwnership GetOwnerID();
+
 protected:
-	UPROPERTY(BlueprintReadOnly)
 	bool bIsAlive = true;
 		
 };

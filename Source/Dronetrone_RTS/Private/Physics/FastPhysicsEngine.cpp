@@ -68,7 +68,7 @@ void UFastPhysicsEngine::ApplyMovement(APawn* Owner, float DeltaTime)
     DrawDebugLine(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + DesiredVelocityNormal * 150, FColor(255, 255, 0));
 
     CurrentVelocity_ = FMath::VInterpTo(FVector(CurrentVelocity_), DesiredVelocity, DeltaTime, InterpVelocity);
-    UE_LOG(LogTemp, Log, TEXT("Current velocity: %s (%.1f cm/s)"), *CurrentVelocity_.ToString(), CurrentVelocity_.Length());
+    //UE_LOG(LogTemp, Log, TEXT("Current velocity: %s (%.1f cm/s)"), *CurrentVelocity_.ToString(), CurrentVelocity_.Length());
 
     // Apply movement and rotation;
     Owner->AddActorWorldOffset(CurrentVelocity_ * DeltaTime, true);

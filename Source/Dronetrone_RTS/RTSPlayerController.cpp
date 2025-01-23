@@ -49,6 +49,12 @@ void ARTSPlayerController::Tick(float DeltaTime)
 	EdgeScroll();
 }
 
+void ARTSPlayerController::SetPlayerInfo(FPlayerInfo* player_info)
+{
+	PlayerInfo = player_info;
+	UE_LOG(LogTemp, Log, TEXT("SetPlayerInfo"));
+}
+
 void ARTSPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
