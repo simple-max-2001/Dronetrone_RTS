@@ -7,6 +7,8 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Pawn.h"
 
+#include "ControlComponent.h"
+
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/OwnershipComponent.h"
@@ -41,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UOwnershipComponent* OwnershipComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UControlComponent* ControlComponent;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UFastPhysicsEngine* FastPhysicsEngine;
@@ -54,5 +59,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	UFUNCTION()
+	void OnUnitDeath();
 
 };

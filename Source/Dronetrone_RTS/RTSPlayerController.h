@@ -63,8 +63,6 @@ public:
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	//class UInputAction* SetDestinationTouchAction;
 
-	void SetPlayerInfo(FPlayerInfo* player_info);
-
 protected:
 	virtual void SetupInputComponent() override;
 	

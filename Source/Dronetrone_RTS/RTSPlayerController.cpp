@@ -38,6 +38,14 @@ void ARTSPlayerController::BeginPlay()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("MappingContext is null!"));
 			}
+
+			ARTSGameState* gs = GetWorld()->GetGameState<ARTSGameState>();
+			
+			if (gs)
+			{
+				PlayerInfo = gs->GetPlayerInfo();
+				if (PlayerInfo) UE_LOG(LogTemp, Log, TEXT("Got player info"));
+			}
 		}
 	}
 }
@@ -47,12 +55,6 @@ void ARTSPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	EdgeScroll();
-}
-
-void ARTSPlayerController::SetPlayerInfo(FPlayerInfo* player_info)
-{
-	PlayerInfo = player_info;
-	UE_LOG(LogTemp, Log, TEXT("SetPlayerInfo"));
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -98,6 +100,18 @@ void ARTSPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSwitchPause);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("PauseAction is null!"));
+
+		if (SelectAction)
+		{
+			//EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSwitchPause);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("SelectAction is null!"));
+
+		if (SetDestinationAction)
+		{
+			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSetDestination);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("SetDestinationAction is null!"));
 
 		//// Setup mouse input events
 		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
@@ -166,6 +180,24 @@ void ARTSPlayerController::OnSwitchPause()
 
 void ARTSPlayerController::OnSetDestination()
 {
+	//UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
+    FHitResult HitResult;
+    GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult);
+
+    if (HitResult.bBlockingHit && PlayerInfo)
+    {
+        FVector TargetLocation = HitResult.ImpactPoint;
+        DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Green, false, 5.0f);
+
+		ARTSGameState* game_state = Cast<ARTSGameState>(GetWorld()->GetGameState());
+		game_state->UpdatePlayersUnits(PlayerInfo->PlayerID);
+
+
+		for (TSoftObjectPtr<ABaseUnit> unit : PlayerInfo->Units)
+		{
+			if (unit.IsValid()) unit->ControlComponent->MoveToLocation(TargetLocation);
+		}
+    }
 }
 
 void ARTSPlayerController::EdgeScroll()

@@ -5,6 +5,8 @@
 // Sets default values
 ABaseUnit::ABaseUnit()
 {
+	UE_LOG(LogTemp, Log, TEXT("ABaseUnit constructor"));
+
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -21,11 +23,13 @@ ABaseUnit::ABaseUnit()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	OwnershipComponent = CreateDefaultSubobject<UOwnershipComponent>(TEXT("OwnershipComponent"));
+
+	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("ControlComponent"));
 	
 	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
 	FastPhysicsEngine->SetAutoActivate(true);
 
-	HealthComponent->OnHealthZero.AddDynamic(EntityComponent, &UEntityComponent::KillEntity);
+	HealthComponent->OnHealthZero.AddDynamic(this, &ABaseUnit::OnUnitDeath);
 
 	SelectionComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionComponent"));
 	SelectionComponent->SetupAttachment(RootComponent);
@@ -54,3 +58,8 @@ void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void ABaseUnit::OnUnitDeath()
+{
+	ControlComponent->SetUncontrollable();
+	EntityComponent->KillEntity();
+}

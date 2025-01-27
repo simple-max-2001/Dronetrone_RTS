@@ -77,9 +77,13 @@ void ARTSGameState::UpdatePlayersUnits(EPlayerFaction player)
 
     for (TSoftObjectPtr<ABaseUnit> unit : Units)
     {
-        if (!unit->OwnershipComponent->IsOwnedBy(player)) continue;
+        if (unit.IsValid())
+        {
+            if (!unit->OwnershipComponent->IsOwnedBy(player)) continue;
 
-        fplayer_->AddUnit(unit);
+            fplayer_->AddUnit(unit);
+        }
+
     }
 
     FText enum_text;
