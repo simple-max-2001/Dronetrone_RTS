@@ -9,6 +9,8 @@
 
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
+#include "Components/OwnershipComponent.h"
+
 #include "Physics/FastPhysicsEngine.h"
 
 #include "BaseUnit.generated.h"
@@ -35,6 +37,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UOwnershipComponent* OwnershipComponent;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

@@ -12,17 +12,20 @@ ABaseUnit::ABaseUnit()
 	BoxComponent->SetSimulatePhysics(false);
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BoxComponent->SetCollisionProfileName(FName("Pawn"));
+	BoxComponent->SetCanEverAffectNavigation(false);
 
 	SetRootComponent(BoxComponent);
 
 	EntityComponent = CreateDefaultSubobject<UEntityComponent>(TEXT("EntityComponent"));
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	OwnershipComponent = CreateDefaultSubobject<UOwnershipComponent>(TEXT("OwnershipComponent"));
 	
 	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
 	FastPhysicsEngine->SetAutoActivate(true);
 
-	HealthComponent->OnHealthZero.AddDynamic(EntityComponent, &UEntityComponent::KillEntity);//.OnHealthZero.AddDynamic();
+	HealthComponent->OnHealthZero.AddDynamic(EntityComponent, &UEntityComponent::KillEntity);
 
 	SelectionComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionComponent"));
 	SelectionComponent->SetupAttachment(RootComponent);

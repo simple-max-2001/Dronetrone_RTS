@@ -42,9 +42,6 @@ public:
 
 protected:
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category="Entity|Ownership")
-	EOwnership OwnerID = EOwnership::NEUTRAL;
-
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -54,9 +51,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	EOwnership GetOwnerID();
 
 protected:
 	bool bIsAlive = true;

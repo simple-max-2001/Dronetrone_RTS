@@ -6,13 +6,11 @@
 
 UENUM(BlueprintType)
 // Enumerator for armor type
-enum class EOwnership : uint8 {
-	NEUTRAL = 0 UMETA(DisplayName = "Neutral"),
-	PLAYER_1 = 1 UMETA(DisplayName = "Player 1"),
-	PLAYER_2 = 2 UMETA(DisplayName = "Player 2"),
-	PLAYER_3 = 3 UMETA(DisplayName = "Player 3"),
-	PLAYER_4 = 4 UMETA(DisplayName = "Player 4"),
-	SERVER = 5 UMETA(DisplayName = "Server")
+enum class EPlayerFaction : uint8 {
+	PLAYER_1 = 0 UMETA(DisplayName = "Player 1"),
+	PLAYER_2 = 1 UMETA(DisplayName = "Player 2"),
+	PLAYER_3 = 2 UMETA(DisplayName = "Player 3"),
+	PLAYER_4 = 3 UMETA(DisplayName = "Player 4")
 };
 
 class DRONETRONE_RTS_API ABaseUnit;

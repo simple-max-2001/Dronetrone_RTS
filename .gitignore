@@ -1,6 +1,14 @@
-/.vs
-/.vsconfig
 /.editorconfig
+
+/.ignore
+
+/.vs
+/.vscode
+/.vsconfig
+
+/*.code-workspace
+
+/Makefile
 
 /Binaries
 /DerivedDataCache

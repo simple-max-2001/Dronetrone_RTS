@@ -21,32 +21,21 @@ void ARTSGameState::BeginPlay()
 {
     UpdateUnits();
 
-    UpdatePlayersUnits(EOwnership::PLAYER_1);
-
-
-
-    //AddPlayerInfo(FPlayerInfo());
-    //AddPlayerInfo(FPlayerInfo(EOwnership::PLAYER_2, false));
-    //AddPlayerInfo(FPlayerInfo(EOwnership::PLAYER_3, false));
+    // UpdatePlayersUnits(EPlayerFaction::PLAYER_1);
+    // UpdatePlayersUnits(EPlayerFaction::PLAYER_2);
 }
 
 void ARTSGameState::AddPlayerInfo(FPlayerInfo player_info)
 {
-    EOwnership player_id = player_info.PlayerID;
+    EPlayerFaction player_id = player_info.PlayerID;
 
     Players.Add(player_id, player_info);
-    UpdatePlayersUnits(player_id);
-
-    FText enum_text;
-    UEnum::GetDisplayValueAsText(player_id, enum_text);
-
-    UE_LOG(LogTemp, Log, TEXT("Found units for %s: %d"), *enum_text.ToString(), Players[player_id].Units.Num());
 }
 
 FPlayerInfo* ARTSGameState::GetPlayerInfo()
 {
     AddPlayerInfo(FPlayerInfo());
-    return &Players[EOwnership::PLAYER_1];
+    return &Players[EPlayerFaction::PLAYER_1];
 }
 
 void ARTSGameState::UpdateUnits()
@@ -66,13 +55,21 @@ void ARTSGameState::UpdateUnits()
             {
                 return Cast<ABaseUnit>(unit);
             });
+
+            TArray<EPlayerFaction> players;
+            Players.GetKeys(players);
+
+            for (EPlayerFaction player : players)
+            {
+                UpdatePlayersUnits(player);
+            }
         }
 
         // TODO: Implement logic for checking unit list
     }
 }
 
-void ARTSGameState::UpdatePlayersUnits(EOwnership player)
+void ARTSGameState::UpdatePlayersUnits(EPlayerFaction player)
 {
     FPlayerInfo* fplayer_ = &Players[player];
 
@@ -80,10 +77,15 @@ void ARTSGameState::UpdatePlayersUnits(EOwnership player)
 
     for (TSoftObjectPtr<ABaseUnit> unit : Units)
     {
-        if (unit->EntityComponent->GetOwnerID() != player) continue;
+        if (!unit->OwnershipComponent->IsOwnedBy(player)) continue;
 
         fplayer_->AddUnit(unit);
     }
+
+    FText enum_text;
+    UEnum::GetDisplayValueAsText(player, enum_text);
+
+    UE_LOG(LogTemp, Log, TEXT("Found units for %s: %d"), *enum_text.ToString(), Players[player].Units.Num());
 }
 
 void ARTSGameState::OnRep_IsGamePaused()

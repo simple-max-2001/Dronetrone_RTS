@@ -43,7 +43,7 @@ struct FPlayerInfo
 
     // Ownership number
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ownership")
-    EOwnership PlayerID = EOwnership::PLAYER_1;
+    EPlayerFaction PlayerID = EPlayerFaction::PLAYER_1;
 
     // If player is human
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Control")
@@ -65,7 +65,7 @@ struct FPlayerInfo
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ownership")
     TMap<int32, FGroupInfo> UnitGroups;
 
-    FPlayerInfo(EOwnership player_id = EOwnership::PLAYER_1, bool is_human = true)
+    FPlayerInfo(EPlayerFaction player_id = EPlayerFaction::PLAYER_1, bool is_human = true)
     {
         PlayerID = player_id;
     }
@@ -82,7 +82,7 @@ struct FPlayerInfo
         Units.Add(NewUnit);
     }
 
-    // Додавання групи юнітів
+    // Create new units groups
     void CreateUnitGroup(int32 GroupID, const TArray<TSoftObjectPtr<ABaseUnit>> GroupUnits)
     {
         FGroupInfo group_info(GroupUnits);
@@ -91,9 +91,6 @@ struct FPlayerInfo
 
 };
 
-/**
- * 
- */
 UCLASS()
 class DRONETRONE_RTS_API ARTSGameState : public AGameStateBase
 {
@@ -108,7 +105,7 @@ public:
 
     void UpdateUnits();
 
-    void UpdatePlayersUnits(EOwnership player);
+    void UpdatePlayersUnits(EPlayerFaction player);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Units")
     TArray<TSoftObjectPtr<AActor>> Buildings;
@@ -124,7 +121,7 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Players")
-    TMap<EOwnership, FPlayerInfo> Players;
+    TMap<EPlayerFaction, FPlayerInfo> Players;
 
     UFUNCTION()
     void OnRep_IsGamePaused();
