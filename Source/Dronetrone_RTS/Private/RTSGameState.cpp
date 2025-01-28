@@ -79,7 +79,7 @@ void ARTSGameState::UpdatePlayersUnits(EPlayerFaction player)
     {
         if (unit.IsValid())
         {
-            if (!unit->OwnershipComponent->IsOwnedBy(player)) continue;
+            if (!unit->SelectionComponent->IsOwnedBy(player)) continue;
 
             fplayer_->AddUnit(unit);
         }

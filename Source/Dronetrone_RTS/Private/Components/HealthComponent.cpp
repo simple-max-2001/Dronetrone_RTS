@@ -23,6 +23,8 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Health = MaxHealth;
+
 	// ...
 	
 }
@@ -49,6 +51,11 @@ float UHealthComponent::GetMaxHealth()
 float UHealthComponent::GetHealthPercentage()
 {
 	return Health / MaxHealth;
+}
+
+bool UHealthComponent::HealthIsFull()
+{
+	return Health >= MaxHealth;
 }
 
 void UHealthComponent::TakeDamage(FDamageData damage)

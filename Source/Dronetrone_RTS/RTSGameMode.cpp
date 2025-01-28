@@ -1,10 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "RTSGameMode.h"
-#include "RTSPlayerController.h"
-#include "RTSGameState.h"
+
 #include "CameraPawn.h"
-#include "UObject/ConstructorHelpers.h"
+#include "RTSGameState.h"
+#include "RTSPlayerController.h"
 
 ARTSGameMode::ARTSGameMode()
 {
@@ -17,7 +17,7 @@ ARTSGameMode::ARTSGameMode()
 	// set default controller to our Blueprinted controller /Script/Engine.Blueprint'/Game/RTS/Player/BP_PlayerController.BP_PlayerController'
 	static ConstructorHelpers::FClassFinder<ARTSPlayerController> PlayerControllerBPClass(TEXT("/Game/RTS/Player/BP_PlayerController.BP_PlayerController_C"));
 
-	if (PlayerControllerBPClass.Class != nullptr)
+	if (PlayerControllerBPClass.Class)
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
@@ -47,4 +47,15 @@ void ARTSGameMode::BeginPlay()
 
 		if (level_mgr) LevelManager = level_mgr;
 	}*/
+}
+
+ERelationType ARTSGameMode::GetRelation(EPlayerFaction own_faction, EPlayerFaction players_faction) const
+{
+	if (own_faction == players_faction) return ERelationType::OWN;
+
+	if ((own_faction == EPlayerFaction::PLAYER_1 && players_faction == EPlayerFaction::PLAYER_2) ||
+		(own_faction == EPlayerFaction::PLAYER_2 && players_faction == EPlayerFaction::PLAYER_1))
+		return ERelationType::FOE;
+
+	return ERelationType::NEUTRAL;
 }

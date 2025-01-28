@@ -82,6 +82,7 @@ protected:
 
 	void OnSwitchPause();
 
+	void OnSelectClick();
 	void OnSetDestination();
 
 	void SetDisableCameraMovement(bool bInDisableCameraMovement);

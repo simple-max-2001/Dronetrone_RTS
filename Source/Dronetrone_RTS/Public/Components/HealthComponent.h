@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetHealthPercentage();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HealthIsFull();
+
 	UFUNCTION(BlueprintCallable)
 	void TakeDamage(FDamageData damage);
 
@@ -70,16 +73,15 @@ public:
 	FOnHealthZero OnHealthZero;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float Health = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Health)
 	float MaxHealth = 100;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Health)
 	EArmorType Armor = EArmorType::LIGHT;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Health)
 	bool bIsImmortar = false;
 		
 };

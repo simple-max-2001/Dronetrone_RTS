@@ -5,8 +5,6 @@
 // Sets default values
 ABaseUnit::ABaseUnit()
 {
-	UE_LOG(LogTemp, Log, TEXT("ABaseUnit constructor"));
-
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -22,7 +20,7 @@ ABaseUnit::ABaseUnit()
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
-	OwnershipComponent = CreateDefaultSubobject<UOwnershipComponent>(TEXT("OwnershipComponent"));
+	SelectionComponent = CreateDefaultSubobject<USelectionComponent>(TEXT("SelectionComponent"));
 
 	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("ControlComponent"));
 	
@@ -31,8 +29,12 @@ ABaseUnit::ABaseUnit()
 
 	HealthComponent->OnHealthZero.AddDynamic(this, &ABaseUnit::OnUnitDeath);
 
-	SelectionComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionComponent"));
-	SelectionComponent->SetupAttachment(RootComponent);
+	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
+	DecalComponent->SetupAttachment(RootComponent);
+	DecalComponent->SetVisibility(false);
+	DecalComponent->SetRelativeRotation(FRotator(-90.f, .0f, .0f));
+
+	SelectionComponent->SetDecalComponent(DecalComponent);
 
 	SetCanAffectNavigationGeneration(false);
 }
