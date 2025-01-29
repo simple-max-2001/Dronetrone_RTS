@@ -55,3 +55,8 @@ TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits()
 
     return Units;
 }
+
+EPlayerFaction ARTSPlayerState::GetPlayerFaction() const
+{
+    return PlayerFaction;
+}

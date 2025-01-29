@@ -33,6 +33,8 @@ public:
 	
 	void UpdateUnits();
 
+	EPlayerFaction GetPlayerFaction() const;
+
 	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
 
 

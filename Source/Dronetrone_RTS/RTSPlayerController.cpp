@@ -161,29 +161,41 @@ void ARTSPlayerController::OnSwitchPause()
 
 void ARTSPlayerController::OnSelectClick()
 {
-	// UE_LOG(LogTemp, Log, TEXT("OnSelectClick"));
-    // FHitResult HitResult;
-    // GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+	ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
 
-    // if (HitResult.bBlockingHit && PlayerInfo)
-    // {
-	// 	ABaseUnit* unit = Cast<ABaseUnit>(HitResult.GetActor());
+	if (!ps) return;
 
-	// 	if (unit)
-	// 	{
-	// 		if (!unit->SelectionComponent->IsSelected())
-	// 		{
-	// 			UE_LOG(LogTemp, Log, TEXT("Unit select"));
-	// 			unit->SelectionComponent->Select(PlayerInfo->PlayerID);
-	// 		}
-	// 		else
-	// 		{
-	// 			UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
-	// 			unit->SelectionComponent->Unselect(PlayerInfo->PlayerID);
-	// 		}
+	UE_LOG(LogTemp, Log, TEXT("OnSelectClick"));
 
-	// 	}
-	// }
+	if (!bKeepSelection) SelectedUnits.Empty(10);
+
+    FHitResult HitResult;
+    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+
+    if (HitResult.bBlockingHit)
+    {
+		ABaseUnit* unit = Cast<ABaseUnit>(HitResult.GetActor());
+
+		if (unit)
+		{
+			CheckSelectedUnits();
+			
+			for (int32 i = SelectedUnits.Num()-1; i >= 0; i--)
+			{
+				if (SelectedUnits[i].Get() == unit)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
+					unit->SelectionComponent->Unselect(ps->GetPlayerFaction());
+					SelectedUnits.RemoveAt(i, 1, false);
+					return;
+				}
+			}
+
+			UE_LOG(LogTemp, Log, TEXT("Unit select"));
+			unit->SelectionComponent->Select(ps->GetPlayerFaction());
+			SelectedUnits.Add(TSoftObjectPtr<ABaseUnit>(unit));
+		}
+	}
 }
 
 void ARTSPlayerController::OnSetDestination()
@@ -201,11 +213,25 @@ void ARTSPlayerController::OnSetDestination()
         FVector TargetLocation = HitResult.ImpactPoint;
         DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Green, false, 5.0f);
 
-		for (TSoftObjectPtr<ABaseUnit> unit : ps->GetAllUnits())
+		CheckSelectedUnits();
+
+		for (TSoftObjectPtr<ABaseUnit> unit : SelectedUnits)
 		{
 			unit->ControlComponent->MoveToLocation(TargetLocation);
 		}
     }
+}
+
+void ARTSPlayerController::CheckSelectedUnits()
+{
+	for (int32 i = SelectedUnits.Num()-1; !SelectedUnits.IsEmpty() && i >= 0; i--)
+	{
+		// Delete from selected units it not valid
+		if (!SelectedUnits[i].IsValid())
+		{
+			SelectedUnits.RemoveAt(i, 1, false);
+		}
+	}
 }
 
 void ARTSPlayerController::EdgeScroll()

@@ -73,7 +73,7 @@ protected:
 
 	void EdgeScroll();
 
-	/* Input handlers for camera movement actions */
+	// Input handlers for camera movement actions
 
 	void OnMoveCamera(const FInputActionInstance& Instance);
 	void OnZoomCamera(const FInputActionInstance& Instance);
@@ -82,14 +82,19 @@ protected:
 
 	void OnSwitchPause();
 
-	void OnSelectClick();
-	void OnSetDestination();
-
 	void SetDisableCameraMovement(bool bInDisableCameraMovement);
 	void SetDisableEdgeScroll(bool bInDisableEdgeScroll);
 
-private:
+	// Input handlers for units management
+	void OnSelectClick();
+	void OnSetDestination();
+
+	void CheckSelectedUnits();
+
 	bool bDisableCameraMovement = false;
 	bool bDisableEdgeScroll = false;
+
+	TArray<TSoftObjectPtr<ABaseUnit>> SelectedUnits;
+	bool bKeepSelection = true;
 
 };
