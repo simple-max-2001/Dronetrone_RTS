@@ -21,21 +21,13 @@ void ARTSGameState::BeginPlay()
 {
     UpdateUnits();
 
-    // UpdatePlayersUnits(EPlayerFaction::PLAYER_1);
-    // UpdatePlayersUnits(EPlayerFaction::PLAYER_2);
-}
-
-void ARTSGameState::AddPlayerInfo(FPlayerInfo player_info)
-{
-    EPlayerFaction player_id = player_info.PlayerID;
-
-    Players.Add(player_id, player_info);
-}
-
-FPlayerInfo* ARTSGameState::GetPlayerInfo()
-{
-    AddPlayerInfo(FPlayerInfo());
-    return &Players[EPlayerFaction::PLAYER_1];
+    // Periodically check units list
+    GetWorld()->GetTimerManager().SetTimer(
+        UnitsCheckingHandle, // handle to cancel timer at a later time
+        this, // the owning object
+        &ARTSGameState::UpdateUnits, // function to call on elapsed
+        1.f, // float delay until elapsed
+        true); // looping?
 }
 
 void ARTSGameState::UpdateUnits()
@@ -49,47 +41,20 @@ void ARTSGameState::UpdateUnits()
 
         UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
 
-        if (Units.IsEmpty())
+        Units.Empty(10);
+
+        Algo::Transform(FoundUnits, Units, [](AActor* unit) -> TSoftObjectPtr<ABaseUnit>
         {
-            Algo::Transform(FoundUnits, Units, [](AActor* unit) -> TSoftObjectPtr<ABaseUnit>
-            {
-                return Cast<ABaseUnit>(unit);
-            });
-
-            TArray<EPlayerFaction> players;
-            Players.GetKeys(players);
-
-            for (EPlayerFaction player : players)
-            {
-                UpdatePlayersUnits(player);
-            }
-        }
-
-        // TODO: Implement logic for checking unit list
+            return Cast<ABaseUnit>(unit);
+        });
     }
 }
 
-void ARTSGameState::UpdatePlayersUnits(EPlayerFaction player)
+TArray<TSoftObjectPtr<ABaseUnit>> ARTSGameState::GetAllUnits()
 {
-    FPlayerInfo* fplayer_ = &Players[player];
+    UpdateUnits();
 
-    fplayer_->Units.Empty(10);
-
-    for (TSoftObjectPtr<ABaseUnit> unit : Units)
-    {
-        if (unit.IsValid())
-        {
-            if (!unit->SelectionComponent->IsOwnedBy(player)) continue;
-
-            fplayer_->AddUnit(unit);
-        }
-
-    }
-
-    FText enum_text;
-    UEnum::GetDisplayValueAsText(player, enum_text);
-
-    UE_LOG(LogTemp, Log, TEXT("Found units for %s: %d"), *enum_text.ToString(), Players[player].Units.Num());
+    return Units;
 }
 
 void ARTSGameState::OnRep_IsGamePaused()

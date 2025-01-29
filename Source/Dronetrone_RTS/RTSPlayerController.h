@@ -92,8 +92,4 @@ private:
 	bool bDisableCameraMovement = false;
 	bool bDisableEdgeScroll = false;
 
-	FPlayerInfo* PlayerInfo;
-
 };
-
-

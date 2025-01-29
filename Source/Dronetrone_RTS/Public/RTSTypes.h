@@ -10,7 +10,8 @@ enum class EPlayerFaction : uint8 {
 	PLAYER_1 = 0 UMETA(DisplayName = "Player 1"),
 	PLAYER_2 = 1 UMETA(DisplayName = "Player 2"),
 	PLAYER_3 = 2 UMETA(DisplayName = "Player 3"),
-	PLAYER_4 = 3 UMETA(DisplayName = "Player 4")
+	PLAYER_4 = 3 UMETA(DisplayName = "Player 4"),
+	SERVER   = 4 UMETA(DisplayName = "Server")
 };
 
 UENUM(BlueprintType)

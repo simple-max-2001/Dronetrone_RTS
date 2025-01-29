@@ -17,6 +17,10 @@ class ARTSGameMode : public AGameModeBase
 public:
 	ARTSGameMode();
 
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+
+    virtual void PostLogin(APlayerController* NewPlayer) override;
+
 	UFUNCTION(BlueprintCallable)
 	ERelationType GetRelation(EPlayerFaction own_faction, EPlayerFaction players_faction) const;
 

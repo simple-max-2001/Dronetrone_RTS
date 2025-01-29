@@ -8,7 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "CameraPawn.h"
-#include "RTSGameState.h"
+#include "RTSPlayerState.h"
 
 ARTSPlayerController::ARTSPlayerController()
 {
@@ -37,14 +37,6 @@ void ARTSPlayerController::BeginPlay()
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("MappingContext is null!"));
-			}
-
-			ARTSGameState* gs = GetWorld()->GetGameState<ARTSGameState>();
-			
-			if (gs)
-			{
-				PlayerInfo = gs->GetPlayerInfo();
-				if (PlayerInfo) UE_LOG(LogTemp, Log, TEXT("Got player info"));
 			}
 		}
 	}
@@ -112,18 +104,6 @@ void ARTSPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSetDestination);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("SetDestinationAction is null!"));
-
-		//// Setup mouse input events
-		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
-		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnSetDestinationTriggered);
-		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSetDestinationReleased);
-		//EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSetDestinationReleased);
-
-		//// Setup touch input events
-		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnInputStarted);
-		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnTouchTriggered);
-		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnTouchReleased);
-		//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnTouchReleased);
 	}
 	else
 	{
@@ -181,48 +161,49 @@ void ARTSPlayerController::OnSwitchPause()
 
 void ARTSPlayerController::OnSelectClick()
 {
-	UE_LOG(LogTemp, Log, TEXT("OnSelectClick"));
-    FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+	// UE_LOG(LogTemp, Log, TEXT("OnSelectClick"));
+    // FHitResult HitResult;
+    // GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 
-    if (HitResult.bBlockingHit && PlayerInfo)
-    {
-		ABaseUnit* unit = Cast<ABaseUnit>(HitResult.GetActor());
+    // if (HitResult.bBlockingHit && PlayerInfo)
+    // {
+	// 	ABaseUnit* unit = Cast<ABaseUnit>(HitResult.GetActor());
 
-		if (unit)
-		{
-			if (!unit->SelectionComponent->IsSelected())
-			{
-				UE_LOG(LogTemp, Log, TEXT("Unit select"));
-				unit->SelectionComponent->Select(PlayerInfo->PlayerID);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
-				unit->SelectionComponent->Unselect(PlayerInfo->PlayerID);
-			}
+	// 	if (unit)
+	// 	{
+	// 		if (!unit->SelectionComponent->IsSelected())
+	// 		{
+	// 			UE_LOG(LogTemp, Log, TEXT("Unit select"));
+	// 			unit->SelectionComponent->Select(PlayerInfo->PlayerID);
+	// 		}
+	// 		else
+	// 		{
+	// 			UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
+	// 			unit->SelectionComponent->Unselect(PlayerInfo->PlayerID);
+	// 		}
 
-		}
-	}
+	// 	}
+	// }
 }
 
 void ARTSPlayerController::OnSetDestination()
 {
-	//UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
+	ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
+
+	if (!ps) return;
+
+	UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult);
 
-    if (HitResult.bBlockingHit && PlayerInfo)
+    if (HitResult.bBlockingHit)
     {
         FVector TargetLocation = HitResult.ImpactPoint;
         DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Green, false, 5.0f);
 
-		ARTSGameState* game_state = GetWorld()->GetGameState<ARTSGameState>();
-		game_state->UpdatePlayersUnits(PlayerInfo->PlayerID);
-
-		for (TSoftObjectPtr<ABaseUnit> unit : PlayerInfo->Units)
+		for (TSoftObjectPtr<ABaseUnit> unit : ps->GetAllUnits())
 		{
-			if (unit.IsValid()) unit->ControlComponent->MoveToLocation(TargetLocation);
+			unit->ControlComponent->MoveToLocation(TargetLocation);
 		}
     }
 }

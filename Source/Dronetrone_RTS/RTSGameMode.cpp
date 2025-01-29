@@ -5,11 +5,14 @@
 #include "CameraPawn.h"
 #include "RTSGameState.h"
 #include "RTSPlayerController.h"
+#include "RTSPlayerState.h"
 
 ARTSGameMode::ARTSGameMode()
 {
 	// use our custom PlayerController class
 	PlayerControllerClass = ARTSPlayerController::StaticClass();
+
+	PlayerStateClass = ARTSPlayerState::StaticClass();
 
 	// set default pawn class to our Blueprinted character
 	DefaultPawnClass = ACameraPawn::StaticClass();
@@ -33,13 +36,13 @@ void ARTSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ARTSGameState* gs = GetGameState<ARTSGameState>();
+	// ARTSGameState* gs = GetGameState<ARTSGameState>();
 
-	if (gs)
-	{
-		gs->AddPlayerInfo(FPlayerInfo(EPlayerFaction::PLAYER_1));
-		gs->AddPlayerInfo(FPlayerInfo(EPlayerFaction::PLAYER_2, false));
-	}
+	// if (gs)
+	// {
+	// 	gs->AddPlayerInfo(FPlayerInfo(EPlayerFaction::PLAYER_1));
+	// 	gs->AddPlayerInfo(FPlayerInfo(EPlayerFaction::PLAYER_2, false));
+	// }
 	// ALandscape* Landscape = Cast<ALandscape>(UGameplayStatics::GetActorOfClass(GetWorld(), ALandscape::StaticClass()));
 	/*if (Landscape)
 	{
@@ -48,6 +51,36 @@ void ARTSGameMode::BeginPlay()
 		if (level_mgr) LevelManager = level_mgr;
 	}*/
 }
+
+void ARTSGameMode::PreLogin(const FString& Options, 
+                            const FString& Address, 
+                            const FUniqueNetIdRepl& UniqueId, 
+                            FString& ErrorMessage)
+{
+    Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+
+    const int32 MaxPlayers = 1;
+    if (GetNumPlayers() >= MaxPlayers) 
+    {
+        ErrorMessage = TEXT("Server is fullfilled!");
+    }
+}
+
+void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+
+    // Receive PlayerState of player
+    ARTSPlayerState* PlayerState = NewPlayer->GetPlayerState<ARTSPlayerState>();
+    if (PlayerState)
+    {
+        // Assign player faction унікальний TeamID
+        PlayerState->Setup(EPlayerFaction::PLAYER_1);
+
+	   // TODO: Implement logic for few players
+    }
+}
+
 
 ERelationType ARTSGameMode::GetRelation(EPlayerFaction own_faction, EPlayerFaction players_faction) const
 {
