@@ -46,11 +46,11 @@ public:
 
 	/* Maximum spring arm length */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings|Zoom", meta = (AllowPrivateAccess = "true"))
-	float MaxArmLength = 2400.f;
+	float MaxArmLength = 1600.f;
 
 	/* Minimum spring arm length */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Settings, meta = (AllowPrivateAccess = "true"))
-	float MinArmLength = 1000.f;
+	float MinArmLength = 600.f;
 
 	/* Maximum spring arm length */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Settings, meta = (AllowPrivateAccess = "true"))
