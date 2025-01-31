@@ -22,7 +22,7 @@ public:
     virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	UFUNCTION(BlueprintCallable)
-	ERelationType GetRelation(EPlayerFaction own_faction, EPlayerFaction players_faction) const;
+	ERelationType GetRelation(int32 owner_1, int32 owner_2) const;
 
 protected:
 	virtual void BeginPlay();

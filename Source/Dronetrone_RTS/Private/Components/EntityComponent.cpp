@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-//#pragma once
-
 #include "Components/EntityComponent.h"
+
+#include "../../RTSGameMode.h"
 
 // Sets default values for this component's properties
 UEntityComponent::UEntityComponent()
@@ -59,7 +59,24 @@ void UEntityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
-bool UEntityComponent::IsAlive()
+bool UEntityComponent::IsAlive() const
 {
 	return bIsAlive;
+}
+
+bool UEntityComponent::IsOwnedBy(int32 owner_id) const
+{
+	return GetRelation(owner_id) == ERelationType::OWN;
+}
+
+ERelationType UEntityComponent::GetRelation(int32 owner_id) const
+{
+	auto* gm = GetWorld()->GetAuthGameMode<ARTSGameMode>();
+
+	if (gm) return gm->GetRelation(OwnerID, owner_id);
+	
+	if (OwnerID == owner_id) return ERelationType::OWN;
+
+	return ERelationType::NEUTRAL;
+	
 }

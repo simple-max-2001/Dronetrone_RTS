@@ -36,10 +36,31 @@ void ARTSGameState::UpdateUnits()
 
     if (world)
     {
+        // Check current units list for invalid
+        for (int32 i = Units.Num()-1; !Units.IsEmpty() && i >= 0; i--)
+        {
+            // Delete from units it not valid
+            if (!Units[i].IsValid())
+            {
+                Units.RemoveAt(i, 1, false);
+            }
+        }
+    
+        // Get all actor of unit class
         TArray<AActor*> FoundUnits;
         UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), FoundUnits);
 
-        UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
+        for (int32 i = 0; i < FoundUnits.Num(); i++)
+        {
+            TSoftObjectPtr<ABaseUnit> unit = Cast<ABaseUnit>(FoundUnits[i]);
+
+            // Delete from units it not valid
+            if (unit.IsValid() && Units.Contains(unit))
+            {
+                Units.Add(unit);
+            }
+        }
+
 
         Units.Empty(10);
 
@@ -47,6 +68,8 @@ void ARTSGameState::UpdateUnits()
         {
             return Cast<ABaseUnit>(unit);
         });
+
+        UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
     }
 }
 

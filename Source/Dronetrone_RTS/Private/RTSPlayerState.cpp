@@ -8,9 +8,9 @@ ARTSPlayerState::ARTSPlayerState()
 
 }
 
-void ARTSPlayerState::Setup(EPlayerFaction player_faction)
+void ARTSPlayerState::Setup(int32 owner_id)
 {
-    PlayerFaction = player_faction;
+    OwnerID = owner_id;
 
     UpdateUnits();
 }
@@ -34,19 +34,14 @@ void ARTSPlayerState::UpdateUnits()
         for (TSoftObjectPtr<ABaseUnit> unit : gs->GetAllUnits())
         {
             // Skip this unit if he is not belong to players faction
-            if (!unit->SelectionComponent->IsOwnedBy(PlayerFaction)) continue;
+            if (!unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If unit is not in our list, add it
             if (!Units.Contains(unit)) Units.Add(unit);
         }
 
-        FText enum_text;
-        UEnum::GetDisplayValueAsText(PlayerFaction, enum_text);
-
-        UE_LOG(LogTemp, Log, TEXT("Found units for %s: %d"), *enum_text.ToString(), Units.Num());
+        UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
     }
-
-
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits()
@@ -56,7 +51,7 @@ TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits()
     return Units;
 }
 
-EPlayerFaction ARTSPlayerState::GetPlayerFaction() const
+int32 ARTSPlayerState::GetOwnerID() const
 {
-    return PlayerFaction;
+    return OwnerID;
 }

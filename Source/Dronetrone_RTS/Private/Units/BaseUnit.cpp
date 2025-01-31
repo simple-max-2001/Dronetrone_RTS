@@ -20,8 +20,6 @@ ABaseUnit::ABaseUnit()
 	
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
-	SelectionComponent = CreateDefaultSubobject<USelectionComponent>(TEXT("SelectionComponent"));
-
 	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("ControlComponent"));
 	
 	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
@@ -33,8 +31,6 @@ ABaseUnit::ABaseUnit()
 	DecalComponent->SetupAttachment(RootComponent);
 	DecalComponent->SetVisibility(false);
 	DecalComponent->SetRelativeRotation(FRotator(-90.f, .0f, .0f));
-
-	SelectionComponent->SetDecalComponent(DecalComponent);
 
 	SetCanAffectNavigationGeneration(false);
 }

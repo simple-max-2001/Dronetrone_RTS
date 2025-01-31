@@ -23,17 +23,11 @@ public:
     // Player faction for ownership
     //UPROPERTY(ReplicatedUsing=OnRep_TeamID)
 
-    void Setup(EPlayerFaction player_faction);
-
-    /** Додає юніт до списку власності */
-    //void AddUnit(AUnitBase* Unit);
-
-    /** Видаляє юніт зі списку власності */
-    //void RemoveUnit(AUnitBase* Unit);
+    void Setup(int32 owner_id);
 	
 	void UpdateUnits();
 
-	EPlayerFaction GetPlayerFaction() const;
+	int32 GetOwnerID() const;
 
 	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
 
@@ -44,5 +38,5 @@ protected:
     TArray<TSoftObjectPtr<ABaseUnit>> Units;
 
     UPROPERTY()
-	EPlayerFaction PlayerFaction;
+	int32 OwnerID;
 };

@@ -74,20 +74,24 @@ void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
     ARTSPlayerState* PlayerState = NewPlayer->GetPlayerState<ARTSPlayerState>();
     if (PlayerState)
     {
-        // Assign player faction унікальний TeamID
-        PlayerState->Setup(EPlayerFaction::PLAYER_1);
+        // Assign owner id
+        PlayerState->Setup(0);
 
 	   // TODO: Implement logic for few players
     }
 }
 
-
-ERelationType ARTSGameMode::GetRelation(EPlayerFaction own_faction, EPlayerFaction players_faction) const
+ERelationType ARTSGameMode::GetRelation(int32 owner_a, int32 owner_b) const
 {
-	if (own_faction == players_faction) return ERelationType::OWN;
+	if (owner_a == owner_b) return ERelationType::OWN;
 
-	if ((own_faction == EPlayerFaction::PLAYER_1 && players_faction == EPlayerFaction::PLAYER_2) ||
-		(own_faction == EPlayerFaction::PLAYER_2 && players_faction == EPlayerFaction::PLAYER_1))
+	int32 owner_s = std::min(owner_a, owner_b);
+	int32 owner_g = std::max(owner_a, owner_b);
+
+	if (owner_s == 0 && owner_g == 1)
+		return ERelationType::FRIEND;
+
+	if ((owner_s == 0 || owner_s == 1) && owner_g == 2)
 		return ERelationType::FOE;
 
 	return ERelationType::NEUTRAL;

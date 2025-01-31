@@ -11,7 +11,6 @@
 
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
-#include "Components/SelectionComponent.h"
 
 #include "Physics/FastPhysicsEngine.h"
 
@@ -39,9 +38,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UHealthComponent* HealthComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-	USelectionComponent* SelectionComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UControlComponent* ControlComponent;

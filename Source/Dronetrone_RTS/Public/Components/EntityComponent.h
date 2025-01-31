@@ -50,9 +50,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsAlive();
+	bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Ownership")
+	bool IsOwnedBy(int32 owner_id) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Ownership")
+	ERelationType GetRelation(int32 owner_id) const;
 
 protected:
 	bool bIsAlive = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Ownership")
+	int32 OwnerID = -1;
 		
 };
