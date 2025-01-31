@@ -78,5 +78,9 @@ ERelationType UEntityComponent::GetRelation(int32 owner_id) const
 	if (OwnerID == owner_id) return ERelationType::OWN;
 
 	return ERelationType::NEUTRAL;
-	
+}
+
+float UEntityComponent::GetSelectionRadius() const
+{
+	return SelectionRadius;
 }

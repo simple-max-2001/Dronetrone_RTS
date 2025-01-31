@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-#include "Units/BaseUnit.h"
 #include "SelectionIndicator.h"
+#include "Units/BaseUnit.h"
 
 #include "SelectionManager.generated.h"
 
@@ -19,11 +19,19 @@ public:
 	// Sets default values for this actor's properties
 	ASelectionManager();
 
-    void SelectUnit(ABaseUnit* Unit);
+	void SetOwnerID(int32 owner_id);
 
-    void DeselectUnit(ABaseUnit* Unit);
+    void SelectUnit(TSoftObjectPtr<ABaseUnit> unit);
+
+    void DeselectUnit(TSoftObjectPtr<ABaseUnit> unit);
 
     void DeselectAll();
+
+	UFUNCTION()
+	void CheckSelection();
+
+	UFUNCTION()
+	TArray<TSoftObjectPtr<ABaseUnit>> GetSelectedUnits();
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,4 +41,5 @@ protected:
     UPROPERTY()
     TMap<TSoftObjectPtr<ABaseUnit>, TSoftObjectPtr<ASelectionIndicator>> SelectedUnits;
 
+	int32 OwnerID = -1;
 };

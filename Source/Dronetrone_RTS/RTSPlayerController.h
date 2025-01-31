@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "RTSGameState.h"
+#include "Selection/SelectionManager.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -94,7 +95,6 @@ protected:
 	bool bDisableCameraMovement = false;
 	bool bDisableEdgeScroll = false;
 
-	TArray<TSoftObjectPtr<ABaseUnit>> SelectedUnits;
-	bool bKeepSelection = true;
+	ASelectionManager* SelectionManager;
 
 };

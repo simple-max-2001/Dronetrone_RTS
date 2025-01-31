@@ -16,9 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	ASelectionIndicator();
 
-    /** Прив’язка до юніта */
+    // Attach indicator to unit
 	UFUNCTION(BlueprintCallable)
-    void AttachToEntity(AActor* entity, float lifetime = .0f);
+    bool AttachToEntity(TSoftObjectPtr<AActor> entity, int32 owner_id, float lifetime = .0f);
 
 protected:
     UDecalComponent* DecalComponent;

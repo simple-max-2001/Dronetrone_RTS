@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Selection/SelectionIndicator.h"
+#include "Components/EntityComponent.h"
+
 
 // Sets default values
 ASelectionIndicator::ASelectionIndicator()
@@ -34,18 +35,56 @@ ASelectionIndicator::ASelectionIndicator()
 	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
 	DecalComponent->SetVisibility(false);
 	DecalComponent->SetRelativeRotation(FRotator(-90.f, .0f, .0f));
+
+	SetRootComponent(DecalComponent);
 }
 
-void ASelectionIndicator::AttachToEntity(AActor* entity, float lifetime)
+bool ASelectionIndicator::AttachToEntity(TSoftObjectPtr<AActor> entity, int32 owner_id, float lifetime)
 {
 
-	// if (!entity)
+	if (!entity.IsValid()) 
+	{
+		Destroy();
+		return false;
+	}
 
-    if (entity)
-    {
-        AttachToActor(entity, FAttachmentTransformRules::KeepRelativeTransform);
-        SetActorHiddenInGame(false);
-    }
+    UEntityComponent* entity_component = entity->FindComponentByClass<UEntityComponent>();
+    
+	if (!entity_component || !entity_component->IsAlive()) 
+	{
+		Destroy();
+		return false;
+	}
+	
+	AttachToActor(entity.Get(), FAttachmentTransformRules::KeepRelativeTransform);
+	
+	UMaterialInterface* DecalMaterial = OwnSelectionMaterial;
+	switch (entity_component->GetRelation(owner_id))
+	{
+		case ERelationType::OWN:
+			break;
 
+		case ERelationType::FRIEND:
+			DecalMaterial = FriendSelectionMaterial;
+			break;
 
+		case ERelationType::FOE:
+			DecalMaterial = FoeSelectionMaterial;
+			break;
+					
+		default:
+			DecalMaterial = NeutralSelectionMaterial;
+			break;
+	}
+
+	if (DecalMaterial)
+	{
+		float radius = entity_component->GetSelectionRadius();
+
+		DecalComponent->SetDecalMaterial(DecalMaterial);
+		DecalComponent->DecalSize = FVector(128, radius, radius);
+		DecalComponent->SetVisibility(true);
+	}
+
+	return true;
 }

@@ -52,16 +52,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Ownership")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	bool IsOwnedBy(int32 owner_id) const;
 
-	UFUNCTION(BlueprintCallable, Category = "Ownership")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	ERelationType GetRelation(int32 owner_id) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Selection")
+	float GetSelectionRadius() const;
 
 protected:
 	bool bIsAlive = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Ownership")
 	int32 OwnerID = -1;
-		
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Selection")
+	float SelectionRadius = 128;
+
 };
