@@ -46,9 +46,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UFastPhysicsEngine* FastPhysicsEngine;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	UDecalComponent* DecalComponent;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -179,21 +179,19 @@ void ARTSPlayerController::OnSelectClick()
 		if (unit)
 		{
 			CheckSelectedUnits();
-			
-			for (int32 i = SelectedUnits.Num()-1; i >= 0; i--)
-			{
-				if (SelectedUnits[i].Get() == unit)
-				{
-					UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
-					//unit->SelectionComponent->Unselect(ps->GetPlayerFaction());
-					SelectedUnits.RemoveAt(i, 1, false);
-					return;
-				}
-			}
 
-			UE_LOG(LogTemp, Log, TEXT("Unit select"));
-			//unit->SelectionComponent->Select(ps->GetPlayerFaction());
-			SelectedUnits.Add(TSoftObjectPtr<ABaseUnit>(unit));
+			if (SelectedUnits.Contains(unit))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Unit unselect"));
+				//unit->SelectionComponent->Unselect(ps->GetPlayerFaction());
+				SelectedUnits.Remove(unit);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Unit select"));
+				//unit->SelectionComponent->Select(ps->GetPlayerFaction());
+				SelectedUnits.Add(TSoftObjectPtr<ABaseUnit>(unit));
+			}
 		}
 	}
 }

@@ -27,11 +27,6 @@ ABaseUnit::ABaseUnit()
 
 	HealthComponent->OnHealthZero.AddDynamic(this, &ABaseUnit::OnUnitDeath);
 
-	DecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalComponent"));
-	DecalComponent->SetupAttachment(RootComponent);
-	DecalComponent->SetVisibility(false);
-	DecalComponent->SetRelativeRotation(FRotator(-90.f, .0f, .0f));
-
 	SetCanAffectNavigationGeneration(false);
 }
 

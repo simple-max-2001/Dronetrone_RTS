@@ -13,8 +13,6 @@ enum class ERelationType : uint8 {
 	FOE     = 3 UMETA(DisplayName = "Foe")
 };
 
-class DRONETRONE_RTS_API ABaseUnit;
-
 /**
  * 
  */
