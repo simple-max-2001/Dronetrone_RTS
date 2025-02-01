@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "CameraPawn.h"
+#include "RTSHUD.h"
 #include "RTSPlayerState.h"
 
 ARTSPlayerController::ARTSPlayerController()
@@ -103,7 +104,10 @@ void ARTSPlayerController::SetupInputComponent()
 
 		if (SelectAction)
 		{
-			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSelectClick);
+			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnSelectTrigger);
+			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSelectStart);
+			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSelectStop);
+			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSelectStop);
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("SelectAction is null!"));
 
@@ -167,13 +171,16 @@ void ARTSPlayerController::OnSwitchPause()
 		game_state->ServerSetPause(!game_state->bIsGamePaused);
 }
 
-void ARTSPlayerController::OnSelectClick()
+void ARTSPlayerController::OnSelectStart()
 {
 	ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
 
 	if (!ps || !SelectionManager) return;
 
-	UE_LOG(LogTemp, Log, TEXT("OnSelectClick"));
+	UE_LOG(LogTemp, Log, TEXT("OnSelectStart"));
+
+	// Start HUD selection
+	if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->StartSelection();
 
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
@@ -184,6 +191,18 @@ void ARTSPlayerController::OnSelectClick()
 
 		SelectionManager->SelectUnit(unit);
 	}
+}
+
+void ARTSPlayerController::OnSelectTrigger()
+{
+	// Stop HUD selection
+	//if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->StartSelection();
+}
+
+void ARTSPlayerController::OnSelectStop()
+{
+	// Stop HUD selection
+	if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->EndSelection();
 }
 
 void ARTSPlayerController::OnSetDestination()

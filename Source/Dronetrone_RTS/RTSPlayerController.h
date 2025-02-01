@@ -87,7 +87,11 @@ protected:
 	void SetDisableEdgeScroll(bool bInDisableEdgeScroll);
 
 	// Input handlers for units management
-	void OnSelectClick();
+	void OnSelectStart();
+	void OnSelectTrigger();
+	void OnSelectStop();
+
+
 	void OnSetDestination();
 
 	void CheckSelectedUnits();
