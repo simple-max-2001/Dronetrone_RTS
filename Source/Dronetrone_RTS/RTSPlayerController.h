@@ -51,6 +51,10 @@ public:
 	/* Select Input Action */
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SelectAction;
+
+	/* Select Input Action */
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* KeepSelectionAction;
 	
 	/* Set destination Input Action */
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

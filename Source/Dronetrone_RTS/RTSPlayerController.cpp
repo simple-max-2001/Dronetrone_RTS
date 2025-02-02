@@ -47,7 +47,11 @@ void ARTSPlayerController::BeginPlay()
         SelectionManager = GetWorld()->SpawnActor<ASelectionManager>();
 
 		ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
-		if (SelectionManager && ps) SelectionManager->SetOwnerID(ps->GetOwnerID());
+		if (SelectionManager && ps)
+		{
+			SelectionManager->SetOwnerID(ps->GetOwnerID());
+			if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->SetSelectionManager(SelectionManager);
+		}
     }
 }
 

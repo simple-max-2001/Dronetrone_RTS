@@ -47,6 +47,26 @@ void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit)
     }
 }
 
+void ASelectionManager::SelectUnits(TArray<ABaseUnit*> units)
+{
+    // DeselectAll();
+
+    for (ABaseUnit* unit : units)
+    {
+        SelectUnit(unit);
+    }
+}
+
+void ASelectionManager::SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units)
+{
+    // DeselectAll();
+
+    for (TSoftObjectPtr<ABaseUnit> unit : units)
+    {
+        SelectUnit(unit);
+    }
+}
+
 void ASelectionManager::DeselectUnit(TSoftObjectPtr<ABaseUnit> unit)
 {
     if (!SelectedUnits.Contains(unit)) return;

@@ -21,7 +21,10 @@ public:
 
 	void SetOwnerID(int32 owner_id);
 
-    void SelectUnit(TSoftObjectPtr<ABaseUnit> unit);
+	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit);
+
+	void SelectUnits(TArray<ABaseUnit*> units);
+	void SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units);
 
     void DeselectUnit(TSoftObjectPtr<ABaseUnit> unit);
 

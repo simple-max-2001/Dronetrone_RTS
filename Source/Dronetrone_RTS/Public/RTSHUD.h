@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+
+#include "Selection/SelectionManager.h"
+
 #include "RTSHUD.generated.h"
 
 /**
@@ -18,6 +21,7 @@ public:
     virtual void DrawHUD() override;
 
     virtual void BeginPlay() override;
+    void SetSelectionManager(ASelectionManager* selection_manger);
 
     void StartSelection();
     void UpdateSelection();
@@ -30,5 +34,7 @@ private:
     bool bIsSelecting = false;
     FVector2D SelectionStart;
     FVector2D SelectionEnd;
+
+    ASelectionManager* SelectionManager;
 
 };

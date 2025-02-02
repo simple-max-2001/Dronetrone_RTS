@@ -9,6 +9,11 @@ void ARTSHUD::BeginPlay()
     Super::BeginPlay();
 }
 
+void ARTSHUD::SetSelectionManager(ASelectionManager* selection_manger)
+{
+    SelectionManager = selection_manger;
+}
+
 void ARTSHUD::StartSelection()
 {
     if (APlayerController* PC = GetOwningPlayerController())
@@ -34,9 +39,7 @@ void ARTSHUD::UpdateSelection()
 void ARTSHUD::EndSelection()
 {
     bIsSelecting = false;
-    // SelectUnitsInRectangle(); // Виклик вибору юнітів
-
-
+    SelectUnitsInRectangle();
 }
 
 void ARTSHUD::SelectUnitsInRectangle()
@@ -52,14 +55,18 @@ void ARTSHUD::SelectUnitsInRectangle()
     TArray<ABaseUnit*> SelectedUnits;
 
     // Receive all units in rectangle
-    GetActorsInSelectionRectangle<ABaseUnit>(SelectionStart, SelectionEnd, SelectedUnits);
+    GetActorsInSelectionRectangle<ABaseUnit>(SelectionStart, SelectionEnd, SelectedUnits, false, false);
 
     // Send selection to SelectionManager
-    // TODO: Implement sending selection to SelectManager
-    //if (ARTSSelectionManager* SelectionManager = Cast<ARTSSelectionManager>(PC->GetPawn()))
-    //{
-    //    SelectionManager->SetSelectedUnits(SelectedUnits);
-    //}
+    if (SelectionManager)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SelectionManager sent %d"), SelectedUnits.Num());
+        SelectionManager->SelectUnits(SelectedUnits);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("No SelectionManager"));
+    }
 }
 
 void ARTSHUD::DrawHUD()
