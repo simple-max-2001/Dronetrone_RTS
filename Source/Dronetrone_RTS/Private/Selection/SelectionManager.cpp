@@ -11,11 +11,6 @@ ASelectionManager::ASelectionManager()
 
 }
 
-void ASelectionManager::SetOwnerID(int32 owner_id)
-{
-	OwnerID = owner_id;
-}
-
 // Called when the game starts or when spawned
 void ASelectionManager::BeginPlay()
 {
@@ -23,13 +18,31 @@ void ASelectionManager::BeginPlay()
 	
 }
 
-void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit)
+void ASelectionManager::SetOwnerID(int32 owner_id)
 {
-	if (SelectedUnits.Contains(unit))
-	{
-		DeselectUnit(unit);
-		return;
-	}
+	OwnerID = owner_id;
+}
+
+void ASelectionManager::SetKeepSelection(bool keep_selection)
+{
+    UE_LOG(LogTemp, Warning, TEXT("KeepSelection %d"), keep_selection);
+    bKeepSelection = keep_selection;
+}
+
+void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect)
+{
+    if (bKeepSelection)
+    {
+        if (SelectedUnits.Contains(unit))
+        {
+            if (deselect) DeselectUnit(unit);
+            return;
+        }
+    }
+    else
+    {
+        if (deselect) DeselectAll();
+    }
 
     if (!unit.IsValid() || !unit->EntityComponent->IsOwnedBy(OwnerID)) return;
 
@@ -49,21 +62,21 @@ void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit)
 
 void ASelectionManager::SelectUnits(TArray<ABaseUnit*> units)
 {
-    // DeselectAll();
+    if (!bKeepSelection) DeselectAll();
 
     for (ABaseUnit* unit : units)
     {
-        SelectUnit(unit);
+        SelectUnit(unit, false);
     }
 }
 
 void ASelectionManager::SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units)
 {
-    // DeselectAll();
+    if (!bKeepSelection) DeselectAll();
 
     for (TSoftObjectPtr<ABaseUnit> unit : units)
     {
-        SelectUnit(unit);
+        SelectUnit(unit, false);
     }
 }
 
@@ -88,6 +101,8 @@ void ASelectionManager::DeselectUnit(TSoftObjectPtr<ABaseUnit> unit)
 
 void ASelectionManager::DeselectAll()
 {
+    if (SelectedUnits.IsEmpty()) return;
+
     for (auto& Pair : SelectedUnits)
     {
 		if (Pair.Key.IsValid())

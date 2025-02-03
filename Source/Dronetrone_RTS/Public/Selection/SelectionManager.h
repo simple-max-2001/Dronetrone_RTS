@@ -20,8 +20,9 @@ public:
 	ASelectionManager();
 
 	void SetOwnerID(int32 owner_id);
+	void SetKeepSelection(bool keep_selection = false);
 
-	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit);
+	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect = true);
 
 	void SelectUnits(TArray<ABaseUnit*> units);
 	void SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units);
@@ -45,4 +46,5 @@ protected:
     TMap<TSoftObjectPtr<ABaseUnit>, TSoftObjectPtr<ASelectionIndicator>> SelectedUnits;
 
 	int32 OwnerID = -1;
+	bool bKeepSelection = false;
 };

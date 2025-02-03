@@ -32,6 +32,7 @@ public:
 private:
 
     bool bIsSelecting = false;
+    bool bSelectionComplete = false;
     FVector2D SelectionStart;
     FVector2D SelectionEnd;
 

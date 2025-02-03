@@ -115,6 +115,14 @@ void ARTSPlayerController::SetupInputComponent()
 		}
 		else UE_LOG(LogTemp, Warning, TEXT("SelectAction is null!"));
 
+		if (KeepSelectionAction)
+		{
+			EnhancedInputComponent->BindAction(KeepSelectionAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnKeepSelectionStart);
+			EnhancedInputComponent->BindAction(KeepSelectionAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnKeepSelectionStop);
+			EnhancedInputComponent->BindAction(KeepSelectionAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnKeepSelectionStop);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("KeepSelectionAction is null!"));
+
 		if (SetDestinationAction)
 		{
 			EnhancedInputComponent->BindAction(SetDestinationAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSetDestination);
@@ -207,6 +215,17 @@ void ARTSPlayerController::OnSelectStop()
 {
 	// Stop HUD selection
 	if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->EndSelection();
+}
+
+
+void ARTSPlayerController::OnKeepSelectionStart()
+{
+	if (SelectionManager) SelectionManager->SetKeepSelection(true);
+}
+
+void ARTSPlayerController::OnKeepSelectionStop()
+{
+	if (SelectionManager) SelectionManager->SetKeepSelection();
 }
 
 void ARTSPlayerController::OnSetDestination()

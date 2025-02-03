@@ -95,6 +95,8 @@ protected:
 	void OnSelectTrigger();
 	void OnSelectStop();
 
+	void OnKeepSelectionStart();
+	void OnKeepSelectionStop();
 
 	void OnSetDestination();
 
