@@ -16,6 +16,8 @@ public:
 	// Sets default values for this component's properties
 	UFastPhysicsEngine();
 
+	void SetPawn(APawn* pawn);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -32,10 +34,14 @@ public:
 protected:
 
 	// Apply unit change of velocity
-	void ApplyMovement(APawn* Owner, float DeltaTime);
+	void ApplyMovement(float DeltaTime);
 
 	// Apply gravity and check collisions under wheels
-	void CheckCollisions(AActor* Owner, float DeltaTime);
+	void CheckCollisions(float DeltaTime);
+
+	// Draw debug lines to unit
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gravity")
+	bool bDrawDebug = false;
 
 	// Apply gravity to unit
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gravity")
@@ -82,4 +88,6 @@ protected:
 
 	// desired yaw rate, deg/s
 	float DesiredYawRate_ = .0f;
+
+	APawn* Pawn;
 };

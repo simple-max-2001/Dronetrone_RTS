@@ -10,6 +10,7 @@
 
 #include "RTSGameState.h"
 #include "Selection/SelectionManager.h"
+#include "UI/SelectionPanelWidget.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -25,43 +26,43 @@ public:
 	ARTSPlayerController();
 
 	/* MappingContext */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta=(AllowPrivateAccess = "true"))
 	class UInputMappingContext* MappingContext;
 
 	/* Camera Move Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* MoveCameraAction;
 
 	/* Camera Zoom Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ZoomCameraAction;
 
 	/* Camera Pan Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PanCameraAction;
 
 	/* Speed Up Camera Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SpeedUpAction;
 
 	/* Pause Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PauseAction;
 
 	/* Select Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SelectAction;
 
 	/* Select Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* KeepSelectionAction;
 	
 	/* Set destination Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* SetDestinationAction;
 
 	/* Camera Pan Input Action */
-	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float EdgeScrollBorder = .05f;
 
 	///** Jump Input Action */
@@ -74,12 +75,13 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	void CreateSelectionWidget();
+
 	virtual void Tick(float DeltaTime) override;
 
 	void EdgeScroll();
 
 	// Input handlers for camera movement actions
-
 	void OnMoveCamera(const FInputActionInstance& Instance);
 	void OnZoomCamera(const FInputActionInstance& Instance);
 	void OnPanCamera();
@@ -107,4 +109,11 @@ protected:
 
 	ASelectionManager* SelectionManager;
 
+	// User widgets classes
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<USelectionPanelWidget> SelectionWidgetClass;
+
+	// User widgets references
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	USelectionPanelWidget* SelectionWidget;
 };

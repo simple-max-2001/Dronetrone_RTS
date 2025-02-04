@@ -2,7 +2,14 @@
 
 
 #include "Movements/SteeringMovementComponent.h"
-#include "Physics/FastPhysicsEngine.h"
+
+
+USteeringMovementComponent::USteeringMovementComponent()
+{
+	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
+	FastPhysicsEngine->SetAutoActivate(true);
+    FastPhysicsEngine->SetPawn(GetOwner<APawn>());
+}
 
 void USteeringMovementComponent::RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed)
 {
@@ -20,15 +27,6 @@ void USteeringMovementComponent::RequestDirectMove(const FVector& MoveVelocity, 
     FVector MoveInput = ForwardVector * ForwardDot * ForwardSpeed * (bForceMaxSpeed ? 1.f : .5f);
     float YawRate = RightDot * RotationSpeed;
 
-
-    if (fpe)
-    {
-        fpe->SetDesiredVelocity(MoveInput);
-        fpe->SetDesiredYawRate(YawRate);
-    }
-    else
-    {
-        FRotator RotationDelta = FRotator(0, YawRate * GetWorld()->DeltaTimeSeconds, 0);
-        MoveUpdatedComponent(MoveInput * GetWorld()->DeltaTimeSeconds, UpdatedComponent->GetComponentRotation() + FRotator(0, YawRate * GetWorld()->DeltaTimeSeconds, 0), true);
-    }
+    FastPhysicsEngine->SetDesiredVelocity(MoveInput);
+    FastPhysicsEngine->SetDesiredYawRate(YawRate);
 }

@@ -22,8 +22,6 @@ ABaseUnit::ABaseUnit()
 
 	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("ControlComponent"));
 	
-	FastPhysicsEngine = CreateDefaultSubobject<UFastPhysicsEngine>(TEXT("FastPhysicsEngine"));
-	FastPhysicsEngine->SetAutoActivate(true);
 
 	HealthComponent->OnHealthZero.AddDynamic(this, &ABaseUnit::OnUnitDeath);
 
@@ -49,6 +47,11 @@ void ABaseUnit::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+UTexture2D* ABaseUnit::GetUnitIcon()
+{
+	return IconTexture;
 }
 
 void ABaseUnit::OnUnitDeath()

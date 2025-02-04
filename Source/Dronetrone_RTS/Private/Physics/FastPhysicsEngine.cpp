@@ -15,6 +15,10 @@ UFastPhysicsEngine::UFastPhysicsEngine()
 	// ...
 }
 
+void UFastPhysicsEngine::SetPawn(APawn* pawn)
+{
+    Pawn = pawn;
+}
 
 // Called when the game starts
 void UFastPhysicsEngine::BeginPlay()
@@ -30,13 +34,10 @@ void UFastPhysicsEngine::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    APawn* owner = Cast<APawn>(GetOwner());
+	if (!Pawn) return;
 
-	if (owner)
-	{
-        ApplyMovement(owner, DeltaTime);
-		CheckCollisions(owner, DeltaTime);
-	}
+    ApplyMovement(DeltaTime);
+	CheckCollisions(DeltaTime);
 }
 
 void UFastPhysicsEngine::SetDesiredVelocity(FVector Velocity)
@@ -49,43 +50,42 @@ void UFastPhysicsEngine::SetDesiredYawRate(float YawRate)
     DesiredYawRate_ = YawRate;
 }
 
-void UFastPhysicsEngine::ApplyMovement(APawn* Owner, float DeltaTime)
+void UFastPhysicsEngine::ApplyMovement(float DeltaTime)
 {
-    UNavMovementComponent* MovementComponent = Owner->FindComponentByClass<UNavMovementComponent>();
-
-    if (!MovementComponent) return;
-
     FVector DesiredVelocity = DesiredVelocity_;
 
     if (bUseGravity) DesiredVelocity.Z = 0;
 
-    // Draw forward vector
-    FVector ForwardVector = Owner->GetActorForwardVector();
-    DrawDebugLine(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + ForwardVector * 150, FColor(0, 0, 255));
+    if (bDrawDebug)
+    {
+        // Draw forward vector
+        FVector ForwardVector = Pawn->GetActorForwardVector();
+        DrawDebugLine(GetWorld(), Pawn->GetActorLocation(), Pawn->GetActorLocation() + ForwardVector * 150, FColor(0, 0, 255));
 
-    // Draw desired velocity vector
-    FVector DesiredVelocityNormal = DesiredVelocity.GetSafeNormal();
-    DrawDebugLine(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + DesiredVelocityNormal * 150, FColor(255, 255, 0));
+        // Draw desired velocity vector
+        FVector DesiredVelocityNormal = DesiredVelocity.GetSafeNormal();
+        DrawDebugLine(GetWorld(), Pawn->GetActorLocation(), Pawn->GetActorLocation() + DesiredVelocityNormal * 150, FColor(255, 255, 0));
+    }
 
     CurrentVelocity_ = FMath::VInterpTo(FVector(CurrentVelocity_), DesiredVelocity, DeltaTime, InterpVelocity);
     //UE_LOG(LogTemp, Log, TEXT("Current velocity: %s (%.1f cm/s)"), *CurrentVelocity_.ToString(), CurrentVelocity_.Length());
 
     // Apply movement and rotation;
-    Owner->AddActorWorldOffset(CurrentVelocity_ * DeltaTime, true);
-    Owner->AddActorLocalRotation(FRotator(.0f, DesiredYawRate_*DeltaTime, .0f));
+    Pawn->AddActorWorldOffset(CurrentVelocity_ * DeltaTime, true);
+    Pawn->AddActorLocalRotation(FRotator(.0f, DesiredYawRate_*DeltaTime, .0f));
 
     DesiredVelocity_ = FVector::ZeroVector;
     DesiredYawRate_ = .0f;
 }
 
-void UFastPhysicsEngine::CheckCollisions(AActor* Owner, float DeltaTime)
+void UFastPhysicsEngine::CheckCollisions(float DeltaTime)
 {
     bIsGrounded = false;
     
     if (!bUseGravity) return;
 
-    FVector ActorLocation = Owner->GetActorLocation();
-    FRotator ActorAttitude = Owner->GetActorRotation();
+    FVector ActorLocation = Pawn->GetActorLocation();
+    FRotator ActorAttitude = Pawn->GetActorRotation();
 
     FVector VForwardOffset = ActorAttitude.RotateVector(FVector(ForwardOffset, 0.0f, 0.0f));
     FVector VRightOffset = ActorAttitude.RotateVector(FVector(0.0f, RightOffset, 0.0f));
@@ -100,7 +100,7 @@ void UFastPhysicsEngine::CheckCollisions(AActor* Owner, float DeltaTime)
 
     // Ignore own collisions
     FCollisionQueryParams CollisionParams;
-    CollisionParams.AddIgnoredActor(Owner);
+    CollisionParams.AddIgnoredActor(Pawn);
 
     float NewAltitude = ActorLocation.Z;
     
@@ -127,10 +127,10 @@ void UFastPhysicsEngine::CheckCollisions(AActor* Owner, float DeltaTime)
         }
 
         // Draw line trace lines for debugging
-        DrawDebugLine(GetWorld(), Start + FVector(0, 0, 50), End, FColor(0, 255u, 0));
+        if (bDrawDebug) DrawDebugLine(GetWorld(), Start + FVector(0, 0, 50), End, FColor(0, 255u, 0));
     }
 
     ActorLocation.Z = NewAltitude;
-    Owner->SetActorLocation(ActorLocation);
+    Pawn->SetActorLocation(ActorLocation);
 }
 

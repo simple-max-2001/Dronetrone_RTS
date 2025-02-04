@@ -10,6 +10,8 @@
 
 #include "SelectionManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSelectionChanged);
+
 UCLASS()
 class DRONETRONE_RTS_API ASelectionManager : public AActor
 {
@@ -22,20 +24,23 @@ public:
 	void SetOwnerID(int32 owner_id);
 	void SetKeepSelection(bool keep_selection = false);
 
-	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect = true);
+	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect = true, bool broadcast = true);
 
-	void SelectUnits(TArray<ABaseUnit*> units);
-	void SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units);
+	void SelectUnits(TArray<ABaseUnit*> units, bool broadcast = true);
+	void SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units, bool broadcast = true);
 
-    void DeselectUnit(TSoftObjectPtr<ABaseUnit> unit);
+    void DeselectUnit(TSoftObjectPtr<ABaseUnit> unit, bool broadcast = true);
 
-    void DeselectAll();
+    void DeselectAll(bool broadcast = true);
 
 	UFUNCTION()
 	void CheckSelection();
 
 	UFUNCTION()
 	TArray<TSoftObjectPtr<ABaseUnit>> GetSelectedUnits();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnSelectionChanged OnSelectionChanged;
 
 protected:
 	// Called when the game starts or when spawned

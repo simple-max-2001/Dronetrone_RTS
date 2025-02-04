@@ -50,6 +50,10 @@ float UHealthComponent::GetMaxHealth()
 
 float UHealthComponent::GetHealthPercentage()
 {
+	if (Health > MaxHealth) return 1;
+
+	if (Health <= 0) return 0;
+
 	return Health / MaxHealth;
 }
 
@@ -96,12 +100,12 @@ void UHealthComponent::TakeDamage(FDamageData damage)
 	{
 		// If lost health, do OnHealthZero broadcast
 		Health = 0;
-		if (OnHealthZero.IsBound()) OnHealthZero.Broadcast();
+		OnHealthZero.Broadcast();
 	}
 	else
 	{
 		// Else do OnHealthChanged broadcast
-		if (OnHealthChanged.IsBound()) OnHealthChanged.Broadcast();
+		OnHealthChanged.Broadcast();
 	}
 }
 

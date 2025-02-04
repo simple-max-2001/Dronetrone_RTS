@@ -29,58 +29,65 @@ void ASelectionManager::SetKeepSelection(bool keep_selection)
     bKeepSelection = keep_selection;
 }
 
-void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect)
+void ASelectionManager::SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect, bool broadcast)
 {
     if (bKeepSelection)
     {
         if (SelectedUnits.Contains(unit))
         {
-            if (deselect) DeselectUnit(unit);
+            if (deselect) DeselectUnit(unit, broadcast);
             return;
         }
     }
     else
     {
-        if (deselect) DeselectAll();
+        if (deselect) DeselectAll(false);
     }
 
-    if (!unit.IsValid() || !unit->EntityComponent->IsOwnedBy(OwnerID)) return;
-
-    // Make selection indicator
-    ASelectionIndicator* indicator = GetWorld()->SpawnActor<ASelectionIndicator>();
-    if (indicator)
+    if (unit.IsValid() && unit->EntityComponent->IsOwnedBy(OwnerID))
     {
-        if (indicator->AttachToEntity(unit, OwnerID))
-		{
-			UE_LOG(LogTemp, Log, TEXT("SelectUnit"));
-		    unit->EntityComponent->OnDieEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
-		    unit->EntityComponent->OnDestroyEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
-        	SelectedUnits.Add(unit, indicator);
-		}
+        // Make selection indicator
+        ASelectionIndicator* indicator = GetWorld()->SpawnActor<ASelectionIndicator>();
+        if (indicator)
+        {
+            if (indicator->AttachToEntity(unit, OwnerID))
+            {
+                UE_LOG(LogTemp, Log, TEXT("SelectUnit"));
+                unit->EntityComponent->OnDieEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
+                unit->EntityComponent->OnDestroyEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
+                SelectedUnits.Add(unit, indicator);
+            }
+        }
     }
+
+    if (broadcast) OnSelectionChanged.Broadcast();
 }
 
-void ASelectionManager::SelectUnits(TArray<ABaseUnit*> units)
+void ASelectionManager::SelectUnits(TArray<ABaseUnit*> units, bool broadcast)
 {
-    if (!bKeepSelection) DeselectAll();
+    if (!bKeepSelection) DeselectAll(false);
 
     for (ABaseUnit* unit : units)
     {
-        SelectUnit(unit, false);
+        SelectUnit(unit, false, false);
     }
+
+    if (broadcast) OnSelectionChanged.Broadcast();
 }
 
-void ASelectionManager::SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units)
+void ASelectionManager::SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units, bool broadcast)
 {
-    if (!bKeepSelection) DeselectAll();
+    if (!bKeepSelection) DeselectAll(false);
 
     for (TSoftObjectPtr<ABaseUnit> unit : units)
     {
-        SelectUnit(unit, false);
+        SelectUnit(unit, false, false);
     }
+
+    if (broadcast) OnSelectionChanged.Broadcast();
 }
 
-void ASelectionManager::DeselectUnit(TSoftObjectPtr<ABaseUnit> unit)
+void ASelectionManager::DeselectUnit(TSoftObjectPtr<ABaseUnit> unit, bool broadcast)
 {
     if (!SelectedUnits.Contains(unit)) return;
 
@@ -97,9 +104,10 @@ void ASelectionManager::DeselectUnit(TSoftObjectPtr<ABaseUnit> unit)
 	if (indicator.IsValid()) indicator->Destroy();
 
 	SelectedUnits.Remove(unit);
+    if (broadcast) OnSelectionChanged.Broadcast();
 }
 
-void ASelectionManager::DeselectAll()
+void ASelectionManager::DeselectAll(bool broadcast)
 {
     if (SelectedUnits.IsEmpty()) return;
 
@@ -115,21 +123,28 @@ void ASelectionManager::DeselectAll()
     }
 
     SelectedUnits.Empty();
+    if (broadcast) OnSelectionChanged.Broadcast();
 }
 
 void ASelectionManager::CheckSelection()
 {
+    bool got_changes = false;
     for (auto It = SelectedUnits.CreateIterator(); It; ++It)
     {
-        if (!It.Key().IsValid() || !It.Key()->EntityComponent->IsAlive()) // If unit is destroyed or dead
+        if (!It.Key().IsValid() ||                          // If unit is destroyed
+            !It.Key()->EntityComponent->IsAlive() ||        // If unit is dead
+            !It.Key()->EntityComponent->IsOwnedBy(OwnerID)) // If is not owned by player
         {
             if (It.Value().IsValid()) // Destroy indicator
             {
                 It.Value()->Destroy();
             }
             It.RemoveCurrent(); // Remove from list
+            got_changes = true;
         }
     }
+
+    if (got_changes) OnSelectionChanged.Broadcast();
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ASelectionManager::GetSelectedUnits()

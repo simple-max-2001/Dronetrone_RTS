@@ -52,6 +52,21 @@ void ARTSPlayerController::BeginPlay()
 			SelectionManager->SetOwnerID(ps->GetOwnerID());
 			if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->SetSelectionManager(SelectionManager);
 		}
+
+		CreateSelectionWidget();
+    }
+}
+
+void ARTSPlayerController::CreateSelectionWidget()
+{
+    if (!SelectionWidgetClass) return;
+
+    SelectionWidget = CreateWidget<USelectionPanelWidget>(this, SelectionWidgetClass);
+
+    if (SelectionWidget)
+    {
+		if (SelectionManager) SelectionWidget->SetSelectionManager(SelectionManager);
+        SelectionWidget->AddToViewport();
     }
 }
 
@@ -189,7 +204,7 @@ void ARTSPlayerController::OnSelectStart()
 
 	if (!ps || !SelectionManager) return;
 
-	UE_LOG(LogTemp, Log, TEXT("OnSelectStart"));
+	//UE_LOG(LogTemp, Log, TEXT("OnSelectStart"));
 
 	// Start HUD selection
 	if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->StartSelection();
@@ -234,7 +249,7 @@ void ARTSPlayerController::OnSetDestination()
 
 	if (!ps || !SelectionManager) return;
 
-	UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
+	//UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
     FHitResult HitResult;
     GetHitResultUnderCursor(ECC_GameTraceChannel1, false, HitResult);
 
