@@ -52,7 +52,6 @@ FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
 
         if (SelectionManager && Unit.IsValid())
         {
-            SelectionManager->DeselectAll(false);
             SelectionManager->SelectUnit(Unit);
             
             // Optionally, return a handled reply
