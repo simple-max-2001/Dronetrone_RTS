@@ -30,6 +30,7 @@ void USelectionPanelWidget::UpdateSelection()
         if (UnitIcon)
         {
             UnitIcon->SetUnit(SelectedUnits[i]);
+            UnitIcon->SetSelectionManager(SelectionManager);
             UnitGridPanel->AddChildToUniformGrid(UnitIcon, i / 4, i % 4);
         }
     }

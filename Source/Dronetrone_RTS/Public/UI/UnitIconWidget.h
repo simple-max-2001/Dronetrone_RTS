@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
 
+#include "Selection/SelectionManager.h"
 #include "Units/BaseUnit.h"
 
 #include "UnitIconWidget.generated.h"
@@ -22,6 +23,8 @@ class DRONETRONE_RTS_API UUnitIconWidget : public UUserWidget
 public:
     void SetUnit(TSoftObjectPtr<ABaseUnit> unit);
 
+    void SetSelectionManager(ASelectionManager* selection_manager);
+
     /** Оновлення інформації про юніта */
 	UFUNCTION()
     void UpdateUnitInfo();
@@ -29,6 +32,8 @@ public:
 protected:
 
 	virtual void NativeDestruct() override;
+
+    virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
 
     UPROPERTY(meta = (BindWidget))
     UImage* UnitImage;
@@ -38,4 +43,7 @@ protected:
 
     UPROPERTY(BlueprintReadOnly)
 	TSoftObjectPtr<ABaseUnit> Unit;
+
+    UPROPERTY(BlueprintReadOnly)
+	ASelectionManager* SelectionManager;
 };
