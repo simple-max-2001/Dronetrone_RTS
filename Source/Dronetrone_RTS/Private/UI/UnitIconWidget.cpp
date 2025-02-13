@@ -2,7 +2,7 @@
 
 #include "UI/UnitIconWidget.h"
 
-void UUnitIconWidget::SetUnit(TSoftObjectPtr<ABaseUnit> unit)
+void UUnitIconWidget::SetUnit(TWeakObjectPtr<ABaseUnit> unit)
 {
     if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.RemoveDynamic(this, &UUnitIconWidget::UpdateUnitInfo);
 
@@ -52,7 +52,7 @@ FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
 
         if (SelectionManager && Unit.IsValid())
         {
-            SelectionManager->SelectUnit(Unit);
+            SelectionManager->Select(Unit);
             
             // Optionally, return a handled reply
             return FReply::Handled();

@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "RTSHUD.h"
 #include "Units/BaseUnit.h"
 
@@ -62,14 +61,11 @@ void ARTSHUD::SelectUnitsInRectangle()
 
     TArray<ABaseUnit*> SelectedUnits;
 
-    UE_LOG(LogTemp, Warning, TEXT("SelectionStart: %.1f %.1f"), SelectionStart.X, SelectionStart.Y);
-    UE_LOG(LogTemp, Warning, TEXT("SelectionEnd: %.1f %.1f"), SelectionEnd.X, SelectionEnd.Y);
-
     // Receive all units in rectangle
     bool res = GetActorsInSelectionRectangle<ABaseUnit>(SelectionStart, SelectionEnd, SelectedUnits, false, false);
     UE_LOG(LogTemp, Warning, TEXT("SelectionManager sent (%d): %d"), res, SelectedUnits.Num());
     
-    SelectionManager->SelectUnits(SelectedUnits);
+    SelectionManager->Select(SelectedUnits);
 
 }
 

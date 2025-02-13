@@ -123,7 +123,6 @@ void ARTSPlayerController::SetupInputComponent()
 
 		if (SelectAction)
 		{
-			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &ARTSPlayerController::OnSelectTrigger);
 			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Started, this, &ARTSPlayerController::OnSelectStart);
 			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Completed, this, &ARTSPlayerController::OnSelectStop);
 			EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Canceled, this, &ARTSPlayerController::OnSelectStop);
@@ -210,20 +209,10 @@ void ARTSPlayerController::OnSelectStart()
 	if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->StartSelection();
 
     FHitResult HitResult;
-    GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+    GetHitResultUnderCursor(ECC_Camera, false, HitResult);
 
     if (HitResult.bBlockingHit)
-    {
-		ABaseUnit* unit = Cast<ABaseUnit>(HitResult.GetActor());
-
-		SelectionManager->SelectUnit(unit);
-	}
-}
-
-void ARTSPlayerController::OnSelectTrigger()
-{
-	// Stop HUD selection
-	//if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->StartSelection();
+		SelectionManager->Select(HitResult.GetActor());
 }
 
 void ARTSPlayerController::OnSelectStop()
@@ -258,7 +247,7 @@ void ARTSPlayerController::OnSetDestination()
         FVector TargetLocation = HitResult.ImpactPoint;
         DrawDebugSphere(GetWorld(), TargetLocation, 50.0f, 12, FColor::Green, false, 5.0f);
 
-		for (TSoftObjectPtr<ABaseUnit> unit : SelectionManager->GetSelectedUnits())
+		for (TWeakObjectPtr<ABaseUnit> unit : SelectionManager->GetSelectedUnits())
 		{
 			unit->ControlComponent->MoveToLocation(TargetLocation);
 		}

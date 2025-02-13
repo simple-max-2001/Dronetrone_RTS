@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/DecalComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Pawn.h"
 

@@ -22,7 +22,7 @@ void USelectionPanelWidget::UpdateSelection()
     if (!UnitGridPanel) return;
 
     UnitGridPanel->ClearChildren();
-    TArray<TSoftObjectPtr<ABaseUnit>> SelectedUnits = SelectionManager->GetSelectedUnits();
+    TArray<TWeakObjectPtr<ABaseUnit>> SelectedUnits = SelectionManager->GetSelectedUnits();
 
     for (int32 i = 0; i < SelectedUnits.Num(); i++)
     {

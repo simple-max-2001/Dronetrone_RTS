@@ -92,11 +92,9 @@ protected:
 	void SetDisableCameraMovement(bool bInDisableCameraMovement);
 	void SetDisableEdgeScroll(bool bInDisableEdgeScroll);
 
-	// Input handlers for units management
+	// Input handlers for selection management
 	void OnSelectStart();
-	void OnSelectTrigger();
 	void OnSelectStop();
-
 	void OnKeepSelectionStart();
 	void OnKeepSelectionStop();
 

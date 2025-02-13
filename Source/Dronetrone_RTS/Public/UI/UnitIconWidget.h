@@ -21,7 +21,7 @@ class DRONETRONE_RTS_API UUnitIconWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-    void SetUnit(TSoftObjectPtr<ABaseUnit> unit);
+    void SetUnit(TWeakObjectPtr<ABaseUnit> unit);
 
     void SetSelectionManager(ASelectionManager* selection_manager);
 
@@ -42,7 +42,7 @@ protected:
     UProgressBar* HealthBar;
 
     UPROPERTY(BlueprintReadOnly)
-	TSoftObjectPtr<ABaseUnit> Unit;
+	TWeakObjectPtr<ABaseUnit> Unit;
 
     UPROPERTY(BlueprintReadOnly)
 	ASelectionManager* SelectionManager;

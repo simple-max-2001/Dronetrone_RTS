@@ -21,34 +21,53 @@ public:
 	// Sets default values for this actor's properties
 	ASelectionManager();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+
 	void SetOwnerID(int32 owner_id);
 	void SetKeepSelection(bool keep_selection = false);
 
-	void SelectUnit(TSoftObjectPtr<ABaseUnit> unit, bool deselect = true, bool broadcast = true);
+	void Select(TWeakObjectPtr<AActor> entity);
+	void Select(TArray<AActor*> entities);
+	void Select(TArray<TWeakObjectPtr<AActor>> entities);
 
-	void SelectUnits(TArray<ABaseUnit*> units, bool broadcast = true);
-	void SelectUnits(TArray<TSoftObjectPtr<ABaseUnit>> units, bool broadcast = true);
+	void Select(TWeakObjectPtr<ABaseUnit> unit);
+	void Select(TArray<ABaseUnit*> units);
+	void Select(TArray<TWeakObjectPtr<ABaseUnit>> units);
 
-    void DeselectUnit(TSoftObjectPtr<ABaseUnit> unit, bool broadcast = true);
+    void Deselect(TWeakObjectPtr<AActor> entity);
 
-    void DeselectAll(bool broadcast = true);
+    void DeselectAll();
 
 	UFUNCTION()
 	void CheckSelection();
 
 	UFUNCTION()
-	TArray<TSoftObjectPtr<ABaseUnit>> GetSelectedUnits();
+	TArray<TWeakObjectPtr<ABaseUnit>> GetSelectedUnits();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnSelectionChanged OnSelectionChanged;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-protected:
+	// Add one entity to selection
+	void AddToSelection(AActor* entity);
+	void AddToSelection(ABaseUnit* entity);
+
+	// Remove one entity from selection
+	void RemoveFromSelection(ABaseUnit* unit);
+
+	// Remove all entities from selection exepting one
+	void RemoveAllFromSelectionBut(ABaseUnit* unit);
+
+	// Remove all entities from selection
+	void RemoveAllFromSelection();
+
     UPROPERTY()
-    TMap<TSoftObjectPtr<ABaseUnit>, TSoftObjectPtr<ASelectionIndicator>> SelectedUnits;
+    TMap<TWeakObjectPtr<ABaseUnit>, TWeakObjectPtr<ASelectionIndicator>> SelectedUnits;
 
 	int32 OwnerID = -1;
 	bool bKeepSelection = false;
