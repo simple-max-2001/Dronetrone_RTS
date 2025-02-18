@@ -22,7 +22,7 @@ class DRONETRONE_RTS_API USelectionPanelWidget : public UUserWidget
 
 public:
 
-	void SetSelectionManager(ASelectionManager* selection_manager);
+	void SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manager);
 
     UFUNCTION(BlueprintCallable)
     void UpdateSelection();
@@ -30,10 +30,10 @@ public:
 protected:
 
     UPROPERTY(meta = (BindWidget))
-    class UUniformGridPanel* UnitGridPanel;
+    UUniformGridPanel* UnitGridPanel;
 
 	UPROPERTY(BlueprintReadOnly)
-	ASelectionManager* SelectionManager;
+	TWeakObjectPtr<ASelectionManager> SelectionManager;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUnitIconWidget> UnitIconWidgetClass;

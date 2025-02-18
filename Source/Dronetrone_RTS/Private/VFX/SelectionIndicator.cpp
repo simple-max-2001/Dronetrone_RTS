@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Selection/SelectionIndicator.h"
+#include "VFX/SelectionIndicator.h"
 #include "Components/EntityComponent.h"
 
 

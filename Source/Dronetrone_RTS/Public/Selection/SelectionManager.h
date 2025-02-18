@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-#include "SelectionIndicator.h"
 #include "Units/BaseUnit.h"
 
 #include "SelectionManager.generated.h"
@@ -38,17 +37,15 @@ public:
 	void Select(TArray<ABaseUnit*> units);
 	void Select(TArray<TWeakObjectPtr<ABaseUnit>> units);
 
-    void Deselect(TWeakObjectPtr<AActor> entity);
-
     void DeselectAll();
 
 	UFUNCTION()
 	void CheckSelection();
 
 	UFUNCTION()
-	TArray<TWeakObjectPtr<ABaseUnit>> GetSelectedUnits();
+	TArray<TWeakObjectPtr<ABaseUnit>> GetSelectedUnits() const;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY()
 	FOnSelectionChanged OnSelectionChanged;
 
 protected:
@@ -60,14 +57,14 @@ protected:
 	// Remove one entity from selection
 	void RemoveFromSelection(ABaseUnit* unit);
 
-	// Remove all entities from selection exepting one
+	// Remove all entities from selection excepting one
 	void RemoveAllFromSelectionBut(ABaseUnit* unit);
 
 	// Remove all entities from selection
 	void RemoveAllFromSelection();
 
     UPROPERTY()
-    TMap<TWeakObjectPtr<ABaseUnit>, TWeakObjectPtr<ASelectionIndicator>> SelectedUnits;
+    TArray<TWeakObjectPtr<ABaseUnit>> SelectedUnits;
 
 	int32 OwnerID = -1;
 	bool bKeepSelection = false;

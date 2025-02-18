@@ -23,7 +23,7 @@ class DRONETRONE_RTS_API UUnitIconWidget : public UUserWidget
 public:
     void SetUnit(TWeakObjectPtr<ABaseUnit> unit);
 
-    void SetSelectionManager(ASelectionManager* selection_manager);
+    void SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manager);
 
     /** Оновлення інформації про юніта */
 	UFUNCTION()
@@ -45,5 +45,5 @@ protected:
 	TWeakObjectPtr<ABaseUnit> Unit;
 
     UPROPERTY(BlueprintReadOnly)
-	ASelectionManager* SelectionManager;
+	TWeakObjectPtr<ASelectionManager> SelectionManager;
 };

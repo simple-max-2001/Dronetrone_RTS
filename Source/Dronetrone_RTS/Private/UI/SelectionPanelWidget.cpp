@@ -4,20 +4,23 @@
 #include "Blueprint/WidgetTree.h"
 #include "Components/Overlay.h"
 
-void USelectionPanelWidget::SetSelectionManager(ASelectionManager* selection_manager)
+void USelectionPanelWidget::SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manager)
 {
     // Remove previous delegate if exists
-    if (SelectionManager) SelectionManager->OnSelectionChanged.RemoveDynamic(this, &USelectionPanelWidget::UpdateSelection);
-
-    SelectionManager = selection_manager;
+    if (SelectionManager.IsValid())
+        SelectionManager->OnSelectionChanged.RemoveDynamic(this, &USelectionPanelWidget::UpdateSelection);
 
     // Add new delegate
-    if (SelectionManager) SelectionManager->OnSelectionChanged.AddDynamic(this, &USelectionPanelWidget::UpdateSelection);
+    if (selection_manager.IsValid())
+    {
+        SelectionManager = selection_manager;
+        SelectionManager->OnSelectionChanged.AddDynamic(this, &USelectionPanelWidget::UpdateSelection);
+    }
 }
 
 void USelectionPanelWidget::UpdateSelection()
 {
-    if (!SelectionManager) return;
+    if (!SelectionManager.IsValid()) return;
 
     if (!UnitGridPanel) return;
 

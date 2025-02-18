@@ -21,7 +21,7 @@ public:
     virtual void DrawHUD() override;
 
     virtual void BeginPlay() override;
-    void SetSelectionManager(ASelectionManager* selection_manger);
+    void SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manger);
 
     void StartSelection();
     void UpdateSelection();
@@ -36,6 +36,6 @@ private:
     FVector2D SelectionStart;
     FVector2D SelectionEnd;
 
-    ASelectionManager* SelectionManager;
+    TWeakObjectPtr<ASelectionManager> SelectionManager;
 
 };

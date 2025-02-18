@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "CameraPawn.h"
+#include "RTSGameState.h"
 #include "RTSHUD.h"
 #include "RTSPlayerState.h"
 
@@ -47,10 +48,18 @@ void ARTSPlayerController::BeginPlay()
         SelectionManager = GetWorld()->SpawnActor<ASelectionManager>();
 
 		ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
-		if (SelectionManager && ps)
+		if (SelectionManager.IsValid() && ps)
 		{
 			SelectionManager->SetOwnerID(ps->GetOwnerID());
 			if (ARTSHUD* hud = GetHUD<ARTSHUD>()) hud->SetSelectionManager(SelectionManager);
+
+			IndicationManager = GetWorld()->SpawnActor<AIndicationManager>();
+			if (IndicationManager.IsValid())
+			{
+				IndicationManager->SetOwnerId(ps->GetOwnerID());
+				IndicationManager->SetSelectionManager(SelectionManager);
+				SelectionManager->OnSelectionChanged.AddDynamic(IndicationManager.Get(), &AIndicationManager::UpdateSelectionIndicators);
+			}
 		}
 
 		CreateSelectionWidget();
@@ -65,7 +74,7 @@ void ARTSPlayerController::CreateSelectionWidget()
 
     if (SelectionWidget)
     {
-		if (SelectionManager) SelectionWidget->SetSelectionManager(SelectionManager);
+		if (SelectionManager.IsValid()) SelectionWidget->SetSelectionManager(SelectionManager);
         SelectionWidget->AddToViewport();
     }
 }
@@ -201,7 +210,7 @@ void ARTSPlayerController::OnSelectStart()
 {
 	ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
 
-	if (!ps || !SelectionManager) return;
+	if (!ps || !SelectionManager.IsValid()) return;
 
 	//UE_LOG(LogTemp, Log, TEXT("OnSelectStart"));
 
@@ -224,19 +233,19 @@ void ARTSPlayerController::OnSelectStop()
 
 void ARTSPlayerController::OnKeepSelectionStart()
 {
-	if (SelectionManager) SelectionManager->SetKeepSelection(true);
+	if (SelectionManager.IsValid()) SelectionManager->SetKeepSelection(true);
 }
 
 void ARTSPlayerController::OnKeepSelectionStop()
 {
-	if (SelectionManager) SelectionManager->SetKeepSelection();
+	if (SelectionManager.IsValid()) SelectionManager->SetKeepSelection();
 }
 
 void ARTSPlayerController::OnSetDestination()
 {
 	ARTSPlayerState* ps = GetPlayerState<ARTSPlayerState>();
 
-	if (!ps || !SelectionManager) return;
+	if (!ps || !SelectionManager.IsValid()) return;
 
 	//UE_LOG(LogTemp, Log, TEXT("OnSetDestination"));
     FHitResult HitResult;

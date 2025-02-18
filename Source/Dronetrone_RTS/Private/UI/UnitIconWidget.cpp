@@ -13,7 +13,7 @@ void UUnitIconWidget::SetUnit(TWeakObjectPtr<ABaseUnit> unit)
     UpdateUnitInfo();
 }
 
-void UUnitIconWidget::SetSelectionManager(ASelectionManager* selection_manager)
+void UUnitIconWidget::SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manager)
 {
     SelectionManager = selection_manager;
 }
@@ -50,7 +50,7 @@ FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
         // Handle the left mouse button down event
         UE_LOG(LogTemp, Warning, TEXT("Left mouse button down!"));
 
-        if (SelectionManager && Unit.IsValid())
+        if (SelectionManager.IsValid() && Unit.IsValid())
         {
             SelectionManager->Select(Unit);
             

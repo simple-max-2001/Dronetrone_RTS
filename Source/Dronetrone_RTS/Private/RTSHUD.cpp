@@ -10,7 +10,7 @@ void ARTSHUD::BeginPlay()
     Super::BeginPlay();
 }
 
-void ARTSHUD::SetSelectionManager(ASelectionManager* selection_manger)
+void ARTSHUD::SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manger)
 {
     SelectionManager = selection_manger;
 }
@@ -45,7 +45,7 @@ void ARTSHUD::EndSelection()
 
 void ARTSHUD::SelectUnitsInRectangle()
 {
-    if (!SelectionManager) 
+    if (!SelectionManager.IsValid()) 
     {
         UE_LOG(LogTemp, Warning, TEXT("No SelectionManager"));
         return;
@@ -63,10 +63,9 @@ void ARTSHUD::SelectUnitsInRectangle()
 
     // Receive all units in rectangle
     bool res = GetActorsInSelectionRectangle<ABaseUnit>(SelectionStart, SelectionEnd, SelectedUnits, false, false);
-    UE_LOG(LogTemp, Warning, TEXT("SelectionManager sent (%d): %d"), res, SelectedUnits.Num());
+    UE_LOG(LogTemp, Log, TEXT("SelectionManager sent (%d): %d"), res, SelectedUnits.Num());
     
-    SelectionManager->Select(SelectedUnits);
-
+    if (res) SelectionManager->Select(SelectedUnits);
 }
 
 void ARTSHUD::DrawHUD()

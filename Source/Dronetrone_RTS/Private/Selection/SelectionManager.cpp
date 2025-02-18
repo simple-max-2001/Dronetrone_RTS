@@ -119,24 +119,6 @@ void ASelectionManager::Select(TArray<TWeakObjectPtr<ABaseUnit>> units)
     OnSelectionChanged.Broadcast();
 }
 
-void ASelectionManager::Deselect(TWeakObjectPtr<AActor> entity)
-{
-    // if (!SelectedUnits.Contains(entity)) return;
-	
-	// // Unsubscribe from die and destroy delegates
-	// if (unit.IsValid())
-	// {
-	// 	unit->EntityComponent->OnDieEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
-	// 	unit->EntityComponent->OnDestroyEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
-	// }
-	// TSoftObjectPtr<ASelectionIndicator> indicator = SelectedUnits[unit];
-
-	// if (indicator.IsValid()) indicator->Destroy();
-
-	// SelectedUnits.Remove(unit);
-    // if (broadcast) OnSelectionChanged.Broadcast();
-}
-
 void ASelectionManager::DeselectAll()
 {
     if (SelectedUnits.IsEmpty()) return;
@@ -151,14 +133,12 @@ void ASelectionManager::CheckSelection()
     bool got_changes = false;
     for (auto It = SelectedUnits.CreateIterator(); It; ++It)
     {
-        if (!It.Key().IsValid() ||                          // If unit is destroyed
-            !It.Key()->EntityComponent->IsAlive() ||        // If unit is dead
-            !It.Key()->EntityComponent->IsOwnedBy(OwnerID)) // If is not owned by player
+        TWeakObjectPtr<ABaseUnit> unit = *It;
+
+        if (!unit.IsValid() ||                          // If unit is destroyed
+            !unit->EntityComponent->IsAlive() ||        // If unit is dead
+            !unit->EntityComponent->IsOwnedBy(OwnerID)) // If is not owned by player
         {
-            if (It.Value().IsValid()) // Destroy indicator
-            {
-                It.Value()->Destroy();
-            }
             It.RemoveCurrent(); // Remove from list
             got_changes = true;
         }
@@ -167,13 +147,9 @@ void ASelectionManager::CheckSelection()
     if (got_changes) OnSelectionChanged.Broadcast();
 }
 
-TArray<TWeakObjectPtr<ABaseUnit>> ASelectionManager::GetSelectedUnits()
+TArray<TWeakObjectPtr<ABaseUnit>> ASelectionManager::GetSelectedUnits() const
 {
-	CheckSelection();
-
-    TArray<TWeakObjectPtr<ABaseUnit>> Units;
-    SelectedUnits.GenerateKeyArray(Units);
-    return Units;
+   return TArray(SelectedUnits);
 }
 
 void ASelectionManager::AddToSelection(AActor* entity)
@@ -186,29 +162,28 @@ void ASelectionManager::AddToSelection(AActor* entity)
 void ASelectionManager::AddToSelection(ABaseUnit* unit)
 {
     if (unit->EntityComponent->IsAlive() &&
-        unit->EntityComponent->IsOwnedBy(OwnerID))
+        unit->EntityComponent->IsOwnedBy(OwnerID) &&
+        !SelectedUnits.Contains(unit))
     {
-        // Make selection indicator
-        ASelectionIndicator* indicator = GetWorld()->SpawnActor<ASelectionIndicator>();
-        if (indicator)
-        {
-            if (indicator->AttachToEntity(unit, OwnerID))
-            {
-                unit->EntityComponent->OnDieEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
-                unit->EntityComponent->OnDestroyEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
-                SelectedUnits.Add(unit, indicator);
-            }
-        }
+        unit->EntityComponent->OnDieEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
+        unit->EntityComponent->OnDestroyEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
+        SelectedUnits.Add(unit);
+        
+        // // Make selection indicator
+        // ASelectionIndicator* indicator = GetWorld()->SpawnActor<ASelectionIndicator>();
+        // if (indicator)
+        // {
+        //     if (indicator->AttachToEntity(unit, OwnerID))
+        //     {
+        //         SelectedUnits.Add(unit, indicator);
+        //     }
+        // }
     }
 }
 
 void ASelectionManager::RemoveFromSelection(ABaseUnit* unit)
 {
-    UE_LOG(LogTemp, Log, TEXT("RemoveFromSelection"));
-
     if (!SelectedUnits.Contains(unit)) return;
-
-    UE_LOG(LogTemp, Log, TEXT("Done RemoveFromSelection"));
 
     // Unsubscribe from die and destroy delegates
     // if (unit_w.IsValid())
@@ -217,9 +192,9 @@ void ASelectionManager::RemoveFromSelection(ABaseUnit* unit)
         unit->EntityComponent->OnDestroyEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
     }
 
-	TWeakObjectPtr<ASelectionIndicator> indicator = SelectedUnits[unit];
+	// TWeakObjectPtr<ASelectionIndicator> indicator = SelectedUnits[unit];
 
-	if (indicator.IsValid()) indicator->Destroy();
+	// if (indicator.IsValid()) indicator->Destroy();
     SelectedUnits.Remove(unit);
 }
 
@@ -227,14 +202,13 @@ void ASelectionManager::RemoveAllFromSelectionBut(ABaseUnit* unit)
 {
     for (auto It = SelectedUnits.CreateIterator(); It; ++It)
     {
-        if (!It.Key().IsValid() ||                          // If unit is destroyed
-            !It.Key()->EntityComponent->IsAlive() ||        // If unit is dead
-            !It.Key()->EntityComponent->IsOwnedBy(OwnerID)) // If is not owned by player
+        TWeakObjectPtr<ABaseUnit> unitIt = *It;
+        
+        if ((!unitIt.IsValid() ||                          // If unit is destroyed
+             !unitIt->EntityComponent->IsAlive() ||        // If unit is dead
+             !unitIt->EntityComponent->IsOwnedBy(OwnerID)) // If is not owned by player
+            && unit != unitIt.Get())
         {
-            if (It.Value().IsValid()) // Destroy indicator
-            {
-                It.Value()->Destroy();
-            }
             It.RemoveCurrent(); // Remove from list
         }
     }
@@ -242,17 +216,17 @@ void ASelectionManager::RemoveAllFromSelectionBut(ABaseUnit* unit)
 
 void ASelectionManager::RemoveAllFromSelection()
 {
-    for (auto& Pair : SelectedUnits)
-    {
-		if (Pair.Key.IsValid())
-		{
-			Pair.Key->EntityComponent->OnDieEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
-			Pair.Key->EntityComponent->OnDestroyEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
-		}
-
-        if (Pair.Value.IsValid())
-            Pair.Value->Destroy();
-    }
+  //   for (auto& Pair : SelectedUnits)
+  //   {
+		// if (Pair.Key.IsValid())
+		// {
+		// 	Pair.Key->EntityComponent->OnDieEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
+		// 	Pair.Key->EntityComponent->OnDestroyEntity.RemoveDynamic(this, &ASelectionManager::CheckSelection);
+		// }
+  //
+  //       if (Pair.Value.IsValid())
+  //           Pair.Value->Destroy();
+  //   }
 
     SelectedUnits.Empty();
 }

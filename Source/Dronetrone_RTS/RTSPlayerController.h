@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
-#include "InputActionValue.h"
+//#include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 
-#include "RTSGameState.h"
 #include "Selection/SelectionManager.h"
 #include "UI/SelectionPanelWidget.h"
+#include "VFX/IndicationManager.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -73,7 +73,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 	void CreateSelectionWidget();
 
@@ -100,12 +100,11 @@ protected:
 
 	void OnSetDestination();
 
-	void CheckSelectedUnits();
-
 	bool bDisableCameraMovement = false;
 	bool bDisableEdgeScroll = false;
 
-	ASelectionManager* SelectionManager;
+	TWeakObjectPtr<ASelectionManager> SelectionManager;
+	TWeakObjectPtr<AIndicationManager> IndicationManager;
 
 	// User widgets classes
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
