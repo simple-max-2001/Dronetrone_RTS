@@ -74,16 +74,16 @@ void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
 
 ERelationType ARTSGameMode::GetRelation(int32 owner_a, int32 owner_b) const
 {
-	if (owner_a == owner_b) return ERelationType::OWN;
+	if (owner_a == owner_b) return ERelationType::Own;
 
 	int32 owner_s = std::min(owner_a, owner_b);
 	int32 owner_g = std::max(owner_a, owner_b);
 
 	if (owner_s == 0 && owner_g == 1)
-		return ERelationType::FRIEND;
+		return ERelationType::Friend;
 
 	if ((owner_s == 0 || owner_s == 1) && owner_g == 2)
-		return ERelationType::FOE;
+		return ERelationType::Foe;
 
-	return ERelationType::NEUTRAL;
+	return ERelationType::Neutral;
 }

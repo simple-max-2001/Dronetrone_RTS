@@ -6,7 +6,6 @@
 #include "GameFramework/GameStateBase.h"
 #include "TimerManager.h"
 
-#include "RTSTypes.h"
 #include "Units/BaseUnit.h"
 
 #include "RTSGameState.generated.h"

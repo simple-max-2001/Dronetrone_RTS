@@ -66,7 +66,7 @@ bool UEntityComponent::IsAlive() const
 
 bool UEntityComponent::IsOwnedBy(int32 owner_id) const
 {
-	return GetRelation(owner_id) == ERelationType::OWN;
+	return GetRelation(owner_id) == ERelationType::Own;
 }
 
 ERelationType UEntityComponent::GetRelation(int32 owner_id) const
@@ -75,9 +75,9 @@ ERelationType UEntityComponent::GetRelation(int32 owner_id) const
 
 	if (gm) return gm->GetRelation(OwnerID, owner_id);
 	
-	if (OwnerID == owner_id) return ERelationType::OWN;
+	if (OwnerID == owner_id) return ERelationType::Own;
 
-	return ERelationType::NEUTRAL;
+	return ERelationType::Neutral;
 }
 
 float UEntityComponent::GetSelectionRadius() const

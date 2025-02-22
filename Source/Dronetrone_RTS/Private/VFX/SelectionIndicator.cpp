@@ -61,14 +61,14 @@ bool ASelectionIndicator::AttachToEntity(TSoftObjectPtr<AActor> entity, int32 ow
 	UMaterialInterface* DecalMaterial = OwnSelectionMaterial;
 	switch (entity_component->GetRelation(owner_id))
 	{
-		case ERelationType::OWN:
+		case ERelationType::Own:
 			break;
 
-		case ERelationType::FRIEND:
+		case ERelationType::Friend:
 			DecalMaterial = FriendSelectionMaterial;
 			break;
 
-		case ERelationType::FOE:
+		case ERelationType::Foe:
 			DecalMaterial = FoeSelectionMaterial;
 			break;
 					

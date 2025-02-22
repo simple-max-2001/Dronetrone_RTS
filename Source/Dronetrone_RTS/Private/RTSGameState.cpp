@@ -19,22 +19,25 @@ bool ARTSGameState::ServerSetPause_Validate(bool bPause)
 
 void ARTSGameState::BeginPlay()
 {
-    UpdateUnits();
+	Super::BeginPlay();
+    
+    if (const UWorld* World = GetWorld())
+    {
+        UpdateUnits();
 
-    // Periodically check units list
-    GetWorld()->GetTimerManager().SetTimer(
-        UnitsCheckingHandle, // handle to cancel timer at a later time
-        this, // the owning object
-        &ARTSGameState::UpdateUnits, // function to call on elapsed
-        1.f, // float delay until elapsed
-        true); // looping?
+        // Periodically check units list
+        World->GetTimerManager().SetTimer(
+            UnitsCheckingHandle, // handle to cancel timer at a later time
+            this, // the owning object
+            &ARTSGameState::UpdateUnits, // function to call on elapsed
+            1.f, // float delay until elapsed
+            true); // looping?
+    }
 }
 
 void ARTSGameState::UpdateUnits()
 {
-    auto* world = GetWorld();
-
-    if (world)
+    if (const UWorld* World = GetWorld())
     {
         // Check current units list for invalid
         for (int32 i = Units.Num()-1; !Units.IsEmpty() && i >= 0; i--)
@@ -48,25 +51,22 @@ void ARTSGameState::UpdateUnits()
     
         // Get all actor of unit class
         TArray<AActor*> FoundUnits;
-        UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseUnit::StaticClass(), FoundUnits);
+        UGameplayStatics::GetAllActorsOfClass(World, ABaseUnit::StaticClass(), FoundUnits);
 
         for (int32 i = 0; i < FoundUnits.Num(); i++)
         {
-            TSoftObjectPtr<ABaseUnit> unit = Cast<ABaseUnit>(FoundUnits[i]);
-
-            // Delete from units it not valid
-            if (unit.IsValid() && Units.Contains(unit))
+            // Add to units list if it is valid and not in list yet
+            if (TSoftObjectPtr<ABaseUnit> Unit = Cast<ABaseUnit>(FoundUnits[i]); Unit.IsValid() && Units.Contains(Unit))
             {
-                Units.Add(unit);
+                Units.Add(Unit);
             }
         }
 
-
         Units.Empty(10);
 
-        Algo::Transform(FoundUnits, Units, [](AActor* unit) -> TSoftObjectPtr<ABaseUnit>
+        Algo::Transform(FoundUnits, Units, [](AActor* Entity) -> TSoftObjectPtr<ABaseUnit>
         {
-            return Cast<ABaseUnit>(unit);
+            return Cast<ABaseUnit>(Entity);
         });
 
         UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
@@ -82,12 +82,15 @@ TArray<TSoftObjectPtr<ABaseUnit>> ARTSGameState::GetAllUnits()
 
 void ARTSGameState::OnRep_IsGamePaused()
 {
-    if (bIsGamePaused)
+    if (const UWorld* World = GetWorld())
     {
-        UGameplayStatics::SetGamePaused(GetWorld(), true);
-    }
-    else
-    {
-        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        if (bIsGamePaused)
+        {
+            UGameplayStatics::SetGamePaused(World, true);
+        }
+        else
+        {
+            UGameplayStatics::SetGamePaused(World, false);
+        }
     }
 }

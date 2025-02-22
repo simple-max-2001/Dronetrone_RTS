@@ -7,18 +7,8 @@
 UENUM(BlueprintType)
 // Enumerator for player faction
 enum class ERelationType : uint8 {
-	OWN     = 0 UMETA(DisplayName = "Own"),
-	FRIEND  = 1 UMETA(DisplayName = "Friend"),
-	NEUTRAL = 2 UMETA(DisplayName = "Neutral"),
-	FOE     = 3 UMETA(DisplayName = "Foe")
+	Own     = 0 UMETA(DisplayName = "Own"),
+	Friend  = 1 UMETA(DisplayName = "Friend"),
+	Neutral = 2 UMETA(DisplayName = "Neutral"),
+	Foe     = 3 UMETA(DisplayName = "Foe")
 };
-
-/**
- * 
- */
-//class DRONETRONE_RTS_API RTSTypes
-//{
-//public:
-//	RTSTypes();
-//	~RTSTypes();
-//};
