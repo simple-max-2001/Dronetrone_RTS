@@ -65,10 +65,6 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	float EdgeScrollBorder = .05f;
 
-	///** Jump Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	//class UInputAction* SetDestinationTouchAction;
-
 protected:
 	virtual void SetupInputComponent() override;
 	

@@ -30,11 +30,10 @@ public:
     void UpdateUnitInfo();
 
 protected:
-
 	virtual void NativeDestruct() override;
 
-    virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
-
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
     UPROPERTY(meta = (BindWidget))
     UImage* UnitImage;
 
