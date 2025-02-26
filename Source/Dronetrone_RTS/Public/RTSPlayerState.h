@@ -31,6 +31,7 @@ public:
 
 	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
 
+	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
 
 protected:
     //UPROPERTY(ReplicatedUsing=OnRep_OwnedUnits)

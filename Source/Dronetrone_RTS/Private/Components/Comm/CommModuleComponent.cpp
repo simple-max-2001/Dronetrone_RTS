@@ -41,3 +41,16 @@ void UCommModuleComponent::UpdateConnection()
 
 	bIsConnected = bConnected;
 }
+
+bool UCommModuleComponent::CheckConnection(UCommRelayComponent* OtherRelay) const
+{
+	// Make reference to relay for checking connection
+	UCommRelayComponent* Relay = OtherRelay ? OtherRelay : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
+
+	// If relay is not given or it is not connected, return false
+	if (!Relay || !Relay->IsConnected()) return false;
+	
+	// TODO: Implement logic for checking connection with relay
+	
+	return true;
+}

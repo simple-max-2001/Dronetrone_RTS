@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateConnection();
 
+	UFUNCTION(BlueprintCallable)
+	virtual bool CheckConnection(UCommRelayComponent* OtherRelay = nullptr) const;
+
 protected:
 	bool bIsConnected = false;
 

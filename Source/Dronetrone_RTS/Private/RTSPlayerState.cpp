@@ -51,6 +51,11 @@ TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits()
     return Units;
 }
 
+TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits() const
+{
+    return Units;
+}
+
 int32 ARTSPlayerState::GetOwnerID() const
 {
     return OwnerID;
