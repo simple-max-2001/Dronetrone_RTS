@@ -27,14 +27,54 @@ public:
 	bool IsConnected() const;
 	
 	UFUNCTION(BlueprintCallable)
-	void UpdateConnection();
+	virtual void UpdateConnection();
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool CheckConnection(UCommRelayComponent* OtherRelay = nullptr) const;
+	virtual bool FindNewRelay();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual bool CheckRelay(UCommRelayComponent* Other = nullptr) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual bool CanCommunicateWithModule(const UCommModuleComponent* Other, bool bBidirectional = true, bool bCheckOwnership = true) const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual TArray<TSoftObjectPtr<UCommModuleComponent>> GetCommNeighbours(bool bCheckOwnership = true, bool bRelaysOnly = true) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual double GetReceiverSensitivity() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual double GetTransmitterPower() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual double GetReceiverGain(FVector Direction) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual double GetTransmitterGain(FVector Direction) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual double GetFrequency() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static double GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver, const FVector Distance, const float Frequency);
 
 protected:
 	bool bIsConnected = false;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CommModuleComponent")
+	double ReceiverSensitivity = 0.f;	// Receiver sensitivity without jamming, W
+	double TransmitterPower = 1.f;		// Transmitter power, W
+	
+	double ReceiverGain = 1.f;		// Receiver antenna gain
+	double TransmitterGain = 1.f;	// Transmitter antenna gain
+
+	double Frequency = 1e10f;	// Let's assume that is "talking" on 10 GHz
+
+	// Maximum search distance for other communication modules
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float MaxSearchDistance = 1e4f;
+	
 	TWeakObjectPtr<UCommRelayComponent> CurrentRelay;
 
 };
