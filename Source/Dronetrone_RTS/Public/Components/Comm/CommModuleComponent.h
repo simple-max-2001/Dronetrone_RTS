@@ -44,19 +44,19 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual TArray<TSoftObjectPtr<UCommRelayComponent>> GetAvailableRelays(const bool bCheckOwnership) const;
 
-	// Get receiver sensitivity, dB
+	// Get receiver sensitivity, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetReceiverSensitivity() const;
 
-	// Get transmitter power, dB
+	// Get transmitter power, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetTransmitterPower() const;
 
-	// Get receiver antenna gain, dB
+	// Get receiver antenna gain, dBi
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetReceiverGain(FVector Direction) const;
 
-	// Get transmitter antenna gain, dB
+	// Get transmitter antenna gain, dBi
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetTransmitterGain(FVector Direction) const;
 
@@ -64,26 +64,26 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetFrequency() const;
 
-	// Calculate power of received signal, dB
+	// Calculate power of received signal, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static float GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver, const FVector Distance, const float Frequency);
 
 protected:
 	bool bIsConnected = false;
 
-	// Receiver sensitivity without jamming, dB
+	// Receiver sensitivity without jamming, dBm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float ReceiverSensitivity = -75.f;
+	float ReceiverSensitivity = -42.f;
 
-	// Transmitter power, dB
+	// Transmitter power, dBm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float TransmitterPower = 3.f;
+	float TransmitterPower = 33.f;
 
-	// Receiver antenna gain, dB
+	// Receiver antenna gain, dBi
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float ReceiverGain = 0.f;
 
-	// Transmitter antenna gain, dB
+	// Transmitter antenna gain, dBi
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float TransmitterGain = 0.f;
 
