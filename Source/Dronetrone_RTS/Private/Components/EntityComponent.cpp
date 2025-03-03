@@ -69,6 +69,12 @@ bool UEntityComponent::IsOwnedBy(int32 owner_id) const
 	return GetRelation(owner_id) == ERelationType::Own;
 }
 
+bool UEntityComponent::IsFriend(UEntityComponent* OtherEntity) const
+{
+	const ERelationType Relation = GetRelation(OtherEntity->GetOwnerID());
+	return Relation == ERelationType::Own || Relation == ERelationType::Friend;
+}
+
 ERelationType UEntityComponent::GetRelation(int32 owner_id) const
 {
 	auto* gm = GetWorld()->GetAuthGameMode<ARTSGameMode>();
@@ -83,4 +89,9 @@ ERelationType UEntityComponent::GetRelation(int32 owner_id) const
 float UEntityComponent::GetSelectionRadius() const
 {
 	return SelectionRadius;
+}
+
+int32 UEntityComponent::GetOwnerID() const
+{
+	return OwnerID;
 }

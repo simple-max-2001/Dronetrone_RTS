@@ -4,16 +4,15 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "RTSTypes.h"
+#include "Components/EntityComponent.h"
 #include "Components/Comm/CommRelayComponent.h"
 
 // Sets default values for this component's properties
 UCommModuleComponent::UCommModuleComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 }
-
 
 // Called when the game starts
 void UCommModuleComponent::BeginPlay()
@@ -30,31 +29,92 @@ bool UCommModuleComponent::IsConnected() const
 
 void UCommModuleComponent::UpdateConnection()
 {
-	bool bConnected = false;
-
 	// Check if it has connection to current relay
 	if (CurrentRelay.IsValid() && CheckRelay(CurrentRelay.Get()))
 	{
-		bConnected = true;
+		bIsConnected = true;
 	}
 	else
 	{
-		// Try to find new relay for connection with new one relay
-		bConnected = FindNewRelay();
+		// Try to find new relay
+		bIsConnected = FindNewRelay();
 	}
-
-	bIsConnected = bConnected;
 }
 
 bool UCommModuleComponent::FindNewRelay()
 {
+	TArray<TSoftObjectPtr<UCommRelayComponent>> NearbyRelays = GetAvailableRelays(true);
+
+	for (TSoftObjectPtr Relay : NearbyRelays)
+	{
+		if (Relay.IsValid() && CheckRelay(Relay.Get()))
+		{
+			CurrentRelay = TWeakObjectPtr<UCommRelayComponent>(Relay.Get());
+			return true;
+		}
+	}
+
+	CurrentRelay.Reset();
 	return false;
+}
+
+
+TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::GetAvailableComms(const bool bCheckOwnership) const
+{
+	TArray<AActor*> OutActors;
+	TArray<TSoftObjectPtr<UCommModuleComponent>> Result;
+
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		GetOwner()->GetActorLocation(),
+		MaxSearchDistance,
+		TArray<TEnumAsByte<EObjectTypeQuery>>(),
+		AActor::StaticClass(),
+		TArray<AActor*>(),
+		OutActors
+	);
+
+	for (const AActor* Actor : OutActors)
+	{
+		if (const UCommModuleComponent* Comm = Actor->FindComponentByClass<UCommModuleComponent>(); Comm && Comm != this && CanCommunicateWithModule(Comm, false, bCheckOwnership))
+		{
+			Result.Add(Comm);
+		}
+	}
+
+	return Result;
+}
+
+TArray<TSoftObjectPtr<UCommRelayComponent>> UCommModuleComponent::GetAvailableRelays(const bool bCheckOwnership) const
+{
+	TArray<AActor*> OutActors;
+	TArray<TSoftObjectPtr<UCommRelayComponent>> Relays;
+
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		GetOwner()->GetActorLocation(),
+		MaxSearchDistance,
+		TArray<TEnumAsByte<EObjectTypeQuery>>(),
+		AActor::StaticClass(),
+		TArray<AActor*>(),
+		OutActors
+	);
+
+	for (const AActor* Actor : OutActors)
+	{
+		if (const UCommRelayComponent* Relay = Actor->FindComponentByClass<UCommRelayComponent>(); Relay && Relay != this && Relay->IsConnected() && CanCommunicateWithModule(Relay, true, bCheckOwnership))
+		{
+			Relays.Add(Relay);
+		}
+	}
+
+	return Relays;
 }
 
 bool UCommModuleComponent::CheckRelay(UCommRelayComponent* Other) const
 {
 	// Make reference to relay for checking connection
-	UCommRelayComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
+	const UCommRelayComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
 
 	// If relay is not given, or it is not connected, return false
 	if (!Relay || !Relay->IsConnected()) return false;
@@ -73,53 +133,31 @@ bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* 
 
 	if (!OwnActor.IsValid() || !OtherActor.IsValid()) return false;
 
+	if (bCheckOwnership)
+	{
+		UEntityComponent* OwnEntity = GET_ENTITY(OwnActor);
+		UEntityComponent* OtherEntity = GET_ENTITY(OtherActor);
+
+		if (!OwnEntity || !OtherEntity || !OwnEntity->IsFriend(OtherEntity)) return false;
+	}
+
 	const FVector OwnLocation = OwnActor->GetActorLocation();
 	const FVector OtherLocation = OtherActor->GetActorLocation();
 
+	// Vector from own module to another module
 	const FVector Distance = OtherLocation - OwnLocation;
 	
 	// If power of received signal is less than receiver sensitivity, return false
 	if (GetSignalPower(this, Other, Distance, GetFrequency()) < GetReceiverSensitivity()) return false;
+	if (bBidirectional && GetSignalPower(Other, this, -Distance, GetFrequency()) < GetReceiverSensitivity()) return false;
 
 	FHitResult Hit;
-
-	// Check if another actor is in line of sight
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(OwnActor.Get());
 	Params.AddIgnoredActor(OtherActor.Get());
 
+	// Check if another actor is in line of sight
 	return !GetWorld()->LineTraceSingleByChannel(Hit, OwnLocation, OtherLocation, ECC_Visibility, Params);
-}
-
-TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::GetCommNeighbours(bool bCheckOwnership, bool bRelaysOnly) const
-{
-	TArray<AActor*> OutActors;
-	TArray<TSoftObjectPtr<UCommModuleComponent>> Result;
-
-	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(),
-		GetOwner()->GetActorLocation(),
-		MaxSearchDistance,
-		TArray<TEnumAsByte<EObjectTypeQuery>>(),
-		AActor::StaticClass(),
-		TArray<AActor*>(),
-		OutActors
-	);
-
-	for (AActor* Actor : OutActors)
-	{
-		UCommModuleComponent* Comm;
-
-		if (bRelaysOnly) Comm = Actor->FindComponentByClass<UCommRelayComponent>();
-		else Comm = Actor->FindComponentByClass<UCommModuleComponent>();
-		
-		if (Comm && Comm != this && CanCommunicateWithModule(Comm, true, bCheckOwnership))
-		{
-			Result.Add(Comm);
-		}
-	}
-
-	return Result;
 }
 
 double UCommModuleComponent::GetReceiverSensitivity() const

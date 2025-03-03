@@ -56,10 +56,15 @@ public:
 	bool IsOwnedBy(int32 owner_id) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
+	bool IsFriend(UEntityComponent* OtherEntity) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	ERelationType GetRelation(int32 owner_id) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Selection")
 	float GetSelectionRadius() const;
+
+	int32 GetOwnerID() const;
 
 protected:
 	bool bIsAlive = true;

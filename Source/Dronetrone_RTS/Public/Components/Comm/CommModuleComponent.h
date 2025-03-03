@@ -39,7 +39,10 @@ public:
 	virtual bool CanCommunicateWithModule(const UCommModuleComponent* Other, bool bBidirectional = true, bool bCheckOwnership = true) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual TArray<TSoftObjectPtr<UCommModuleComponent>> GetCommNeighbours(bool bCheckOwnership = true, bool bRelaysOnly = true) const;
+	virtual TArray<TSoftObjectPtr<UCommModuleComponent>> GetAvailableComms(const bool bCheckOwnership) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual TArray<TSoftObjectPtr<UCommRelayComponent>> GetAvailableRelays(const bool bCheckOwnership) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual double GetReceiverSensitivity() const;

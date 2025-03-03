@@ -12,3 +12,6 @@ enum class ERelationType : uint8 {
 	Neutral = 2 UMETA(DisplayName = "Neutral"),
 	Foe     = 3 UMETA(DisplayName = "Foe")
 };
+
+// Get entity component 
+#define GET_ENTITY(actor) actor->FindComponentByClass<UEntityComponent>() 
