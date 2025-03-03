@@ -160,44 +160,43 @@ bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* 
 	return !GetWorld()->LineTraceSingleByChannel(Hit, OwnLocation, OtherLocation, ECC_Visibility, Params);
 }
 
-double UCommModuleComponent::GetReceiverSensitivity() const
+float UCommModuleComponent::GetReceiverSensitivity() const
 {
 	return ReceiverSensitivity;
 }
 
-double UCommModuleComponent::GetTransmitterPower() const
+float UCommModuleComponent::GetTransmitterPower() const
 {
 	return TransmitterPower;
 }
 
-double UCommModuleComponent::GetReceiverGain(FVector Direction) const
+float UCommModuleComponent::GetReceiverGain(FVector Direction) const
 {
 	return ReceiverGain;
 }
 
-double UCommModuleComponent::GetTransmitterGain(FVector Direction) const
+float UCommModuleComponent::GetTransmitterGain(FVector Direction) const
 {
 	return TransmitterGain;
 }
 
-double UCommModuleComponent::GetFrequency() const
+float UCommModuleComponent::GetFrequency() const
 {
 	return Frequency;
 }
 
-double UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver,
+float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver,
 	const FVector Distance, const float Frequency)
 {
-	// Calculates received power P_r using Friis Transmission Equation:
-	//		P_r = P_t * G_t * G_r * (c/(4*pi*f*d))^2
+	// Calculates logarithmic received power P_r (dB) using Friis Transmission Equation:
+	//		P_r = P_t + G_t + G_r + 20*log_10[c/(4*pi*f*d)]
 	// where
-	//	* P_t - power of transmitter
-	//	* G_t - gain coefficient of transmitters antenna
-	//	* G_r - gain coefficient of receivers antenna
-	//	* c - speed of light 3*10^8 m/s (3*10^10 cm/s)
+	//	* P_t - power of transmitter, dB
+	//	* G_t - gain coefficient of transmitters antenna, dB
+	//	* G_r - gain coefficient of receivers antenna, dB
+	//	* c - speed of light, 3*10^10 cm/s
 	//	* f - signal frequency, Hz
-	//	* d - distance between transmitter and receiver antennas
+	//	* d - distance between transmitter and receiver antennas, cm
 	
-	const double Coefficient = 3e10f / (4 * PI * Frequency * Distance.Length());
-	return Transmitter->GetTransmitterPower() * Transmitter->GetTransmitterGain(Distance) * Receiver->GetReceiverGain(-Distance) * Coefficient * Coefficient;
+	return Transmitter->GetTransmitterPower() + Transmitter->GetTransmitterGain(Distance) + Receiver->GetReceiverGain(-Distance) + 20 * log10f(30.f / (4 * PI * Frequency * Distance.Length()));
 }

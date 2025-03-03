@@ -44,38 +44,55 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual TArray<TSoftObjectPtr<UCommRelayComponent>> GetAvailableRelays(const bool bCheckOwnership) const;
 
+	// Get receiver sensitivity, dB
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual double GetReceiverSensitivity() const;
+	virtual float GetReceiverSensitivity() const;
 
+	// Get transmitter power, dB
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual double GetTransmitterPower() const;
+	virtual float GetTransmitterPower() const;
 
+	// Get receiver antenna gain, dB
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual double GetReceiverGain(FVector Direction) const;
+	virtual float GetReceiverGain(FVector Direction) const;
 
+	// Get transmitter antenna gain, dB
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual double GetTransmitterGain(FVector Direction) const;
+	virtual float GetTransmitterGain(FVector Direction) const;
 
+	// Get communication frequency, GHz
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual double GetFrequency() const;
+	virtual float GetFrequency() const;
 
+	// Calculate power of received signal, dB
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static double GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver, const FVector Distance, const float Frequency);
+	static float GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver, const FVector Distance, const float Frequency);
 
 protected:
 	bool bIsConnected = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CommModuleComponent")
-	double ReceiverSensitivity = 0.f;	// Receiver sensitivity without jamming, W
-	double TransmitterPower = 1.f;		// Transmitter power, W
-	
-	double ReceiverGain = 1.f;		// Receiver antenna gain
-	double TransmitterGain = 1.f;	// Transmitter antenna gain
+	// Receiver sensitivity without jamming, dB
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	float ReceiverSensitivity = -72.5f;
 
-	double Frequency = 1e10f;	// Let's assume that is "talking" on 10 GHz
+	// Transmitter power, dB
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	float TransmitterPower = 3.f;
 
-	// Maximum search distance for other communication modules
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	// Receiver antenna gain, dB
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	float ReceiverGain = 0.f;
+
+	// Transmitter antenna gain, dB
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	float TransmitterGain = 0.f;
+
+	// Communication frequency, GHz
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	float Frequency = 10.f;	
+
+	// Maximum search distance for other communication modules, cm
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float MaxSearchDistance = 1e4f;
 	
 	TWeakObjectPtr<UCommRelayComponent> CurrentRelay;

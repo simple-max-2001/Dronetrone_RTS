@@ -14,5 +14,11 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRONETRONE_RTS_API UCommRelayComponent : public UCommModuleComponent
 {
 	GENERATED_BODY()
+
+public:
+	void StartChecking();
+
+	void StopChecking();
+
 	
 };

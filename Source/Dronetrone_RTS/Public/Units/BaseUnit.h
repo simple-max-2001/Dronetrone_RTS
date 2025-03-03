@@ -10,6 +10,7 @@
 
 #include "Components/EntityComponent.h"
 #include "Components/HealthComponent.h"
+#include "Components/Comm/CommModuleComponent.h"
 
 #include "Physics/FastPhysicsEngine.h"
 
@@ -40,6 +41,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UControlComponent* ControlComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	UCommModuleComponent* CommsComponent;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")

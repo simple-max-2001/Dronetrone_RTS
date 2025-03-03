@@ -8,7 +8,7 @@ ABaseUnit::ABaseUnit()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 	BoxComponent->SetSimulatePhysics(false);
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	BoxComponent->SetCollisionProfileName(FName("Pawn"));
@@ -16,12 +16,13 @@ ABaseUnit::ABaseUnit()
 
 	SetRootComponent(BoxComponent);
 
-	EntityComponent = CreateDefaultSubobject<UEntityComponent>(TEXT("EntityComponent"));
+	EntityComponent = CreateDefaultSubobject<UEntityComponent>(TEXT("Entity"));
 	
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 
-	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("ControlComponent"));
-	
+	ControlComponent = CreateDefaultSubobject<UControlComponent>(TEXT("Controls"));
+
+	CommsComponent = CreateDefaultSubobject<UCommModuleComponent>(TEXT("Communicator"));
 
 	HealthComponent->OnHealthZero.AddDynamic(this, &ABaseUnit::OnUnitDeath);
 
