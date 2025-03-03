@@ -73,7 +73,7 @@ protected:
 
 	// Receiver sensitivity without jamming, dB
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float ReceiverSensitivity = -72.5f;
+	float ReceiverSensitivity = -75.f;
 
 	// Transmitter power, dB
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -89,7 +89,7 @@ protected:
 
 	// Communication frequency, GHz
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float Frequency = 10.f;	
+	float Frequency = 2.4f;	
 
 	// Maximum search distance for other communication modules, cm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
