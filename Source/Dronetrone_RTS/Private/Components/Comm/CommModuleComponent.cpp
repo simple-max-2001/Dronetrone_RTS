@@ -157,7 +157,7 @@ bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* 
 	Params.AddIgnoredActor(OtherActor.Get());
 
 	// Check if another actor is in line of sight
-	return !GetWorld()->LineTraceSingleByChannel(Hit, OwnLocation, OtherLocation, ECC_Visibility, Params);
+	return !GetWorld()->LineTraceSingleByChannel(Hit, OwnLocation, OtherLocation, ECC_GameTraceChannel4, Params);
 }
 
 float UCommModuleComponent::GetReceiverSensitivity() const

@@ -8,9 +8,9 @@ ARTSPlayerState::ARTSPlayerState()
 
 }
 
-void ARTSPlayerState::Setup(int32 owner_id)
+void ARTSPlayerState::Setup(int32 Owner_ID)
 {
-    OwnerID = owner_id;
+    OwnerID = Owner_ID;
 
     UpdateUnits();
 }

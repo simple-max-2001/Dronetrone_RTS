@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
 
-#include "RTSTypes.h"
+#include "Buildings/BaseBuilding.h"
+#include "Units/BaseUnit.h"
+#include "Components/Comm/CommRelayComponent.h"
 
 #include "RTSPlayerState.generated.h"
 
@@ -20,10 +22,7 @@ class DRONETRONE_RTS_API ARTSPlayerState : public APlayerState
 public:
     ARTSPlayerState();
 
-    // Player faction for ownership
-    //UPROPERTY(ReplicatedUsing=OnRep_TeamID)
-
-    void Setup(int32 owner_id);
+    void Setup(int32 Owner_ID);
 	
 	void UpdateUnits();
 
@@ -34,10 +33,19 @@ public:
 	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
 
 protected:
-    //UPROPERTY(ReplicatedUsing=OnRep_OwnedUnits)
-    UPROPERTY()
-    TArray<TSoftObjectPtr<ABaseUnit>> Units;
+	//UPROPERTY(ReplicatedUsing=OnRep_OwnedUnits)
+	UPROPERTY()
+	TArray<TSoftObjectPtr<ABaseUnit>> Units;
+	
+	UPROPERTY()
+	TArray<TSoftObjectPtr<ABaseBuilding>> Buildings;
+	
+	UPROPERTY()
+	TArray<TSoftObjectPtr<UCommRelayComponent>> Relays;
 
     UPROPERTY()
 	int32 OwnerID;
+
+	UPROPERTY()
+    FTimerHandle NetworkUpdateHandle;
 };

@@ -10,11 +10,9 @@
 
 #include "EntityComponent.generated.h"
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSpawnEntity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDieEntity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyEntity);
-
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRONETRONE_RTS_API UEntityComponent : public UActorComponent
@@ -53,26 +51,27 @@ public:
 	bool IsAlive() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
-	bool IsOwnedBy(int32 owner_id) const;
+	bool IsOwnedBy(int32 Owner_ID) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
-	bool IsFriend(UEntityComponent* OtherEntity) const;
+	bool IsFriend(UEntityComponent* OtherEntity, bool bOwnerOnly = true) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
-	ERelationType GetRelation(int32 owner_id) const;
+	ERelationType GetRelation(int32 Owner_ID) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Selection")
 	float GetSelectionRadius() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	int32 GetOwnerID() const;
 
 protected:
 	bool bIsAlive = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Ownership")
+	UPROPERTY(EditInstanceOnly, Category = "Ownership")
 	int32 OwnerID = -1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Selection")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Selection")
 	float SelectionRadius = 128;
 
 };

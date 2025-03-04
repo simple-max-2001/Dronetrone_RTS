@@ -19,7 +19,7 @@ class DRONETRONE_RTS_API ARTSGameState : public AGameStateBase
 public:
     virtual void BeginPlay() override;
 
-    void UpdateUnits();
+    void UpdateEntities();
 
     TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
 

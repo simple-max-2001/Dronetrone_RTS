@@ -10,10 +10,6 @@ UEntityComponent::UEntityComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-	//OnDieEntity.Broadcast();
-	//OnDestroyEntity.Broadcast();
 }
 
 
@@ -64,24 +60,24 @@ bool UEntityComponent::IsAlive() const
 	return bIsAlive;
 }
 
-bool UEntityComponent::IsOwnedBy(int32 owner_id) const
+bool UEntityComponent::IsOwnedBy(int32 Owner_ID) const
 {
-	return GetRelation(owner_id) == ERelationType::Own;
+	return GetRelation(Owner_ID) == ERelationType::Own;
 }
 
-bool UEntityComponent::IsFriend(UEntityComponent* OtherEntity) const
+bool UEntityComponent::IsFriend(UEntityComponent* OtherEntity, bool bOwnerOnly) const
 {
 	const ERelationType Relation = GetRelation(OtherEntity->GetOwnerID());
 	return Relation == ERelationType::Own || Relation == ERelationType::Friend;
 }
 
-ERelationType UEntityComponent::GetRelation(int32 owner_id) const
+ERelationType UEntityComponent::GetRelation(int32 Owner_ID) const
 {
 	auto* gm = GetWorld()->GetAuthGameMode<ARTSGameMode>();
 
-	if (gm) return gm->GetRelation(OwnerID, owner_id);
+	if (gm) return gm->GetRelation(OwnerID, Owner_ID);
 	
-	if (OwnerID == owner_id) return ERelationType::Own;
+	if (OwnerID == Owner_ID) return ERelationType::Own;
 
 	return ERelationType::Neutral;
 }

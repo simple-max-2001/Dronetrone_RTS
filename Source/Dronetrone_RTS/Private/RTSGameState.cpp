@@ -23,19 +23,19 @@ void ARTSGameState::BeginPlay()
     
     if (const UWorld* World = GetWorld())
     {
-        UpdateUnits();
+        UpdateEntities();
 
         // Periodically check units list
         World->GetTimerManager().SetTimer(
             UnitsCheckingHandle, // handle to cancel timer at a later time
             this, // the owning object
-            &ARTSGameState::UpdateUnits, // function to call on elapsed
+            &ARTSGameState::UpdateEntities, // function to call on elapsed
             1.f, // float delay until elapsed
             true); // looping?
     }
 }
 
-void ARTSGameState::UpdateUnits()
+void ARTSGameState::UpdateEntities()
 {
     if (const UWorld* World = GetWorld())
     {
@@ -75,7 +75,7 @@ void ARTSGameState::UpdateUnits()
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSGameState::GetAllUnits()
 {
-    UpdateUnits();
+    UpdateEntities();
 
     return Units;
 }

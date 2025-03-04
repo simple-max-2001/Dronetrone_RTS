@@ -15,10 +15,16 @@ class DRONETRONE_RTS_API UCommRelayComponent : public UCommModuleComponent
 {
 	GENERATED_BODY()
 
-public:
-	void StartChecking();
+public:	
+	void ResetChecked();
 
-	void StopChecking();
-
+	void MarkAsChecked();
 	
+	virtual void UpdateConnection() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Relay")
+	bool bIsSuper = false;
+
+	bool bIsChecked = false;
 };
