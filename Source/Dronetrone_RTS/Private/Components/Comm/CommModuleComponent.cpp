@@ -135,29 +135,17 @@ bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* 
 
 	if (bCheckOwnership)
 	{
-		UEntityComponent* OwnEntity = GET_ENTITY(OwnActor);
 		UEntityComponent* OtherEntity = GET_ENTITY(OtherActor);
 
-		if (!OwnEntity || !OtherEntity || !OwnEntity->IsFriend(OtherEntity)) return false;
+		if (const UEntityComponent* OwnEntity = GET_ENTITY(OwnActor);
+			!OwnEntity || !OtherEntity || !OwnEntity->IsFriend(OtherEntity)) return false;
 	}
-
-	const FVector OwnLocation = OwnActor->GetActorLocation();
-	const FVector OtherLocation = OtherActor->GetActorLocation();
-
-	// Vector from own module to another module
-	const FVector Distance = OtherLocation - OwnLocation;
 	
 	// If power of received signal is less than receiver sensitivity, return false
-	if (GetSignalPower(this, Other, Distance, GetFrequency()) < GetReceiverSensitivity()) return false;
-	if (bBidirectional && GetSignalPower(Other, this, -Distance, GetFrequency()) < GetReceiverSensitivity()) return false;
+	if (GetSignalPower(Other, GetFrequency()) < GetReceiverSensitivity()) return false;
+	if (bBidirectional && GetSignalPower(Other, GetFrequency(), false) < GetReceiverSensitivity()) return false;
 
-	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(OwnActor.Get());
-	Params.AddIgnoredActor(OtherActor.Get());
-
-	// Check if another actor is in line of sight
-	return !GetWorld()->LineTraceSingleByChannel(Hit, OwnLocation, OtherLocation, ECC_GameTraceChannel4, Params);
+	return true;
 }
 
 float UCommModuleComponent::GetReceiverSensitivity() const
@@ -170,25 +158,69 @@ float UCommModuleComponent::GetTransmitterPower() const
 	return TransmitterPower;
 }
 
-float UCommModuleComponent::GetReceiverGain(FVector Direction) const
+TSoftObjectPtr<UAntennaComponent> UCommModuleComponent::GetReceiverAntenna() const
 {
-	return ReceiverGain;
+	return TSoftObjectPtr<UAntennaComponent>(ReceiverAntenna);
 }
 
-float UCommModuleComponent::GetTransmitterGain(FVector Direction) const
+TSoftObjectPtr<UAntennaComponent> UCommModuleComponent::GetTransmitterAntenna() const
 {
-	return TransmitterGain;
+	return TSoftObjectPtr<UAntennaComponent>(TransmitterAntenna);
 }
 
 float UCommModuleComponent::GetFrequency() const
 {
-	return Frequency;
+	return CommFrequency;
 }
 
-float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver,
-	const FVector Distance, const float Frequency)
+float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
+	float Frequency, const bool bSelfIsReceiver, const bool bCheckCollisions) const
 {
-	// Calculates logarithmic received power P_r (dB) using Friis Transmission Equation:
+	// If another module is null pointer, try to refer to current relay
+	if (!Other)
+	{
+		if (CurrentRelay.IsValid())
+			Other = CurrentRelay.Get();
+		else
+			return WEAKEST_SIGNAL;
+	}
+
+	// If talking frequency is less than zero, return weakest signal level
+	if (Frequency <= 0) return WEAKEST_SIGNAL;
+	
+	// Define receiver and transmitter communication modules
+	const UCommModuleComponent* Transmitter = bSelfIsReceiver ? Other : this;
+	const UCommModuleComponent* Receiver = bSelfIsReceiver ? this : Other;
+
+	// Try to get transmitter and receiver antennas. On fail return weakest signal level
+	const TSoftObjectPtr<UAntennaComponent> TransmitterA = Transmitter->GetTransmitterAntenna();
+	const TSoftObjectPtr<UAntennaComponent> ReceiverA = Receiver->GetReceiverAntenna();
+
+	if (!TransmitterA.IsValid() || !ReceiverA.IsValid()) return WEAKEST_SIGNAL;
+
+	// Get locations of receiver and transmitter antenna
+	const FVector ReceiverLocation = ReceiverA->GetComponentLocation();
+	const FVector TransmitterLocation = TransmitterA->GetComponentLocation();
+
+	// Calculate vector from transmitter antenna to receiver antenna
+	const FVector T2R = ReceiverLocation - TransmitterLocation;
+
+	// If checking of line of sight is needed, check it, using line trace
+	if (bCheckCollisions)
+	{
+		if (const UWorld* World = GetWorld(); World)
+		{
+			FCollisionParameters Params;
+			
+			if (FHitResult Hit; World->LineTraceSingleByChannel(Hit, TransmitterLocation, ReceiverLocation, ECC_GameTraceChannel4))
+				return WEAKEST_SIGNAL;
+		}
+	}
+
+	// Make sure that distance is not close to zero
+	const float Distance = FMath::Max(T2R.Length(), 1.f);
+
+	// Calculates received power P_r (dBm) using Friis Transmission Equation:
 	//		P_r = P_t + G_t + G_r + 20*log_10[c/(4*pi*f*d)]
 	// where
 	//	* P_t - power of transmitter, dB
@@ -197,6 +229,5 @@ float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Transmitt
 	//	* c - speed of light, 3*10^10 cm/s
 	//	* f - signal frequency, Hz
 	//	* d - distance between transmitter and receiver antennas, cm
-	
-	return Transmitter->GetTransmitterPower() + Transmitter->GetTransmitterGain(Distance) + Receiver->GetReceiverGain(-Distance) + 20 * log10f(30.f / (4 * PI * Frequency * Distance.Length()));
+	return Transmitter->GetTransmitterPower() + TransmitterA->GetAntennaGain(T2R) + ReceiverA->GetAntennaGain(-T2R) + 20 * log10f(30.f / (4 * PI * Frequency * Distance));
 }

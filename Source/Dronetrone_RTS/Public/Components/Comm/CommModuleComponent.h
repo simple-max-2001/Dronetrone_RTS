@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "AntennaComponent.h"
+
 #include "CommModuleComponent.generated.h"
 
 class UCommRelayComponent;
@@ -52,13 +55,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual float GetTransmitterPower() const;
 
-	// Get receiver antenna gain, dBi
+	// Get receiver antenna component reference
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual float GetReceiverGain(FVector Direction) const;
+	TSoftObjectPtr<UAntennaComponent> GetReceiverAntenna() const;
 
-	// Get transmitter antenna gain, dBi
+	// Get transmitter antenna component reference
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual float GetTransmitterGain(FVector Direction) const;
+	TSoftObjectPtr<UAntennaComponent> GetTransmitterAntenna() const;
 
 	// Get communication frequency, GHz
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -66,7 +69,7 @@ public:
 
 	// Calculate power of received signal, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	static float GetSignalPower(const UCommModuleComponent* Transmitter, const UCommModuleComponent* Receiver, const FVector Distance, const float Frequency);
+	float GetSignalPower(const UCommModuleComponent* Other = nullptr, float Frequency = 0, const bool bSelfIsReceiver = true, const bool bCheckCollisions = true) const;
 
 protected:
 	bool bIsConnected = false;
@@ -89,12 +92,21 @@ protected:
 
 	// Communication frequency, GHz
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float Frequency = 2.4f;	
+	float CommFrequency = 2.4f;	
 
 	// Maximum search distance for other communication modules, cm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float MaxSearchDistance = 1e4f;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Communication")
 	TWeakObjectPtr<UCommRelayComponent> CurrentRelay;
+
+	// Reference to receiver antenna component
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	UAntennaComponent* ReceiverAntenna;
+
+	// Reference to transmitter antenna component
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
+	UAntennaComponent* TransmitterAntenna;
 
 };

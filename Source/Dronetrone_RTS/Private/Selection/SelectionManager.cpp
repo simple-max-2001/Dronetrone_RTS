@@ -168,16 +168,6 @@ void ASelectionManager::AddToSelection(ABaseUnit* unit)
         unit->EntityComponent->OnDieEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
         unit->EntityComponent->OnDestroyEntity.AddDynamic(this, &ASelectionManager::CheckSelection);
         SelectedUnits.Add(unit);
-        
-        // // Make selection indicator
-        // ASelectionIndicator* indicator = GetWorld()->SpawnActor<ASelectionIndicator>();
-        // if (indicator)
-        // {
-        //     if (indicator->AttachToEntity(unit, OwnerID))
-        //     {
-        //         SelectedUnits.Add(unit, indicator);
-        //     }
-        // }
     }
 }
 

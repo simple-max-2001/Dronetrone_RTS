@@ -13,5 +13,8 @@ enum class ERelationType : uint8 {
 	Foe     = 3 UMETA(DisplayName = "Foe")
 };
 
-// Get entity component 
-#define GET_ENTITY(actor) actor->FindComponentByClass<UEntityComponent>() 
+// Get entity component of actor
+#define GET_ENTITY(actor) actor->FindComponentByClass<UEntityComponent>()
+
+// Weakest signal level in dBm
+#define WEAKEST_SIGNAL -200.f
