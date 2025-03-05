@@ -20,22 +20,16 @@ public:
 	// Sets default values for this actor's properties
 	ASelectionManager();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void SetOwnerID(int32 Owner_ID);
+	void SetKeepSelection(bool bKeep_Selection = false);
 
-public:
+	void Select(TWeakObjectPtr<AActor> Entity);
+	void Select(TArray<AActor*> Entities);
+	void Select(TArray<TWeakObjectPtr<AActor>> Entities);
 
-	void SetOwnerID(int32 owner_id);
-	void SetKeepSelection(bool keep_selection = false);
-
-	void Select(TWeakObjectPtr<AActor> entity);
-	void Select(TArray<AActor*> entities);
-	void Select(TArray<TWeakObjectPtr<AActor>> entities);
-
-	void Select(TWeakObjectPtr<ABaseUnit> unit);
-	void Select(TArray<ABaseUnit*> units);
-	void Select(TArray<TWeakObjectPtr<ABaseUnit>> units);
+	void Select(TWeakObjectPtr<ABaseUnit> Unit);
+	void Select(TArray<ABaseUnit*> Units);
+	void Select(TArray<TWeakObjectPtr<ABaseUnit>> Units);
 
     void DeselectAll();
 
@@ -51,14 +45,14 @@ public:
 protected:
 
 	// Add one entity to selection
-	void AddToSelection(AActor* entity);
-	void AddToSelection(ABaseUnit* entity);
+	void AddToSelection(AActor* Entity);
+	void AddToSelection(ABaseUnit* Unit);
 
 	// Remove one entity from selection
-	void RemoveFromSelection(ABaseUnit* unit);
+	void RemoveFromSelection(ABaseUnit* Unit);
 
 	// Remove all entities from selection excepting one
-	void RemoveAllFromSelectionBut(ABaseUnit* unit);
+	void RemoveAllFromSelectionBut(ABaseUnit* Unit);
 
 	// Remove all entities from selection
 	void RemoveAllFromSelection();
