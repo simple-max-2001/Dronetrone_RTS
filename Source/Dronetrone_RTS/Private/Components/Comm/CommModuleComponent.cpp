@@ -19,7 +19,22 @@ void UCommModuleComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UpdateConnection();
+	if (const UWorld* World = GetWorld())
+	{
+		UpdateConnection();
+
+		if (ConnectionUpdatePeriod > 0)
+		{
+			// Periodically check connection
+			World->GetTimerManager().SetTimer(
+				ConnectionCheckHandle, // handle to cancel timer at a later time
+				this, // the owning object
+				&UCommModuleComponent::UpdateConnection, // function to call on elapsed
+				ConnectionUpdatePeriod, // float delay until elapsed
+				true); // looping?
+		}
+	}
+	
 }
 
 bool UCommModuleComponent::IsConnected() const
@@ -111,7 +126,7 @@ TArray<TSoftObjectPtr<UCommRelayComponent>> UCommModuleComponent::GetAvailableRe
 	return Relays;
 }
 
-bool UCommModuleComponent::CheckRelay(UCommRelayComponent* Other) const
+bool UCommModuleComponent::CheckRelay(const UCommRelayComponent* Other) const
 {
 	// Make reference to relay for checking connection
 	const UCommRelayComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;

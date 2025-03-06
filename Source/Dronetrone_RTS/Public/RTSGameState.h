@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "TimerManager.h"
 
 #include "Units/BaseUnit.h"
+#include "Buildings/BaseBuilding.h"
 
 #include "RTSGameState.generated.h"
 
@@ -21,7 +21,9 @@ public:
 
     void UpdateEntities();
 
-    TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
+    TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
+
+    TArray<TSoftObjectPtr<ABaseBuilding>> GetAllBuildings() const;
 
     //UPROPERTY(ReplicatedUsing = OnRep_IsGamePaused)
     bool bIsGamePaused = false;
@@ -31,7 +33,7 @@ public:
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Entities")
-    TArray<TSoftObjectPtr<AActor>> Buildings;
+    TArray<TSoftObjectPtr<ABaseBuilding>> Buildings;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Entities")
     TArray<TSoftObjectPtr<ABaseUnit>> Units;

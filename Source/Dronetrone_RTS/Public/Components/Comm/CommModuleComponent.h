@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TimerManager.h"
 
 #include "AntennaComponent.h"
 
@@ -36,7 +37,7 @@ public:
 	virtual bool FindNewRelay();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual bool CheckRelay(UCommRelayComponent* Other = nullptr) const;
+	virtual bool CheckRelay(const UCommRelayComponent* Other = nullptr) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	virtual bool CanCommunicateWithModule(const UCommModuleComponent* Other, bool bBidirectional = true, bool bCheckOwnership = true) const;
@@ -99,7 +100,7 @@ protected:
 	float MaxSearchDistance = 1e4f;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Communication")
-	TWeakObjectPtr<UCommRelayComponent> CurrentRelay;
+	TWeakObjectPtr<const UCommRelayComponent> CurrentRelay;
 
 	// Reference to receiver antenna component
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -108,5 +109,10 @@ protected:
 	// Reference to transmitter antenna component
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	UAntennaComponent* TransmitterAntenna;
+	
+	// Period of update connection, seconds
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Communication")
+	float ConnectionUpdatePeriod = .2f;
 
+	FTimerHandle ConnectionCheckHandle;
 };

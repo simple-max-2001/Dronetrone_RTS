@@ -15,12 +15,21 @@ class DRONETRONE_RTS_API UCommRelayComponent : public UCommModuleComponent
 {
 	GENERATED_BODY()
 
+	UCommRelayComponent();
+
+protected:
+	virtual void BeginPlay() override;
+	
 public:	
 	void ResetChecked();
 
 	void MarkAsChecked();
+
+	bool TryToConnectWith(const UCommRelayComponent* Relay, bool bOwnOnly);
 	
 	virtual void UpdateConnection() override;
+
+	bool GetIsSuper() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Relay")
