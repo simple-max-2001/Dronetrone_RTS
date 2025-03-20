@@ -12,43 +12,48 @@ void ARTSPlayerState::Setup(int32 Owner_ID)
 {
     OwnerID = Owner_ID;
 
-    UpdateUnits();
+    UpdateEntities();
 }
 
-void ARTSPlayerState::UpdateUnits()
+void ARTSPlayerState::UpdateEntities()
 {
-
     // Remove all invalid units
-    for (int32 i = Units.Num()-1; i >= 0; i--)
+    for (const auto& Unit : Units)
     {
-        if (!Units[i].IsValid())
-        {
-            Units.RemoveAt(i, 1, false);
-        }
+        if (!Unit.IsValid()) Units.Remove(Unit);
+    }
+    
+    // Remove all invalid buildings
+    for (const auto& Building : Buildings)
+    {
+        if (!Building.IsValid()) Buildings.Remove(Building);
     }
 
-    ARTSGameState* gs = GetWorld()->GetGameState<ARTSGameState>();
-    if (gs)
+    if (const ARTSGameState* GS = GetWorld()->GetGameState<ARTSGameState>())
     {
         // Add new units if they appeared
-        for (TSoftObjectPtr<ABaseUnit> unit : gs->GetAllUnits())
+        for (TSoftObjectPtr Unit : GS->GetAllUnits())
         {
-            // Skip this unit if he is not belong to players faction
-            if (!unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
+            // Skip this unit if it is not belong to players faction
+            if (!Unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If unit is not in our list, add it
-            if (!Units.Contains(unit)) Units.Add(unit);
+            if (!Units.Contains(Unit)) Units.Add(Unit);
+        }
+
+        // Add new buildings if they appeared
+        for (TSoftObjectPtr Building : GS->GetAllBuildings())
+        {
+            // Skip this building if it is not belong to players faction
+            if (!Building->EntityComponent->IsOwnedBy(OwnerID)) continue;
+
+            // If building is not in our list, add it
+            if (!Buildings.Contains(Building)) Buildings.Add(Building);
         }
 
         UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
+        UE_LOG(LogTemp, Log, TEXT("Found buildings for OwnerID %d: %d"), OwnerID, Buildings.Num());
     }
-}
-
-TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits()
-{
-    UpdateUnits();
-
-    return Units;
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits() const

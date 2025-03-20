@@ -59,7 +59,7 @@ void ASelectionManager::Select(TArray<TWeakObjectPtr<AActor>> Entities)
 {
     if (!bKeepSelection) RemoveAllFromSelection();
 
-    for (TWeakObjectPtr<AActor> Entity : Entities)
+    for (TWeakObjectPtr Entity : Entities)
     {
         // Apply multiple selection only if entity is unit
         if (!Cast<ABaseUnit>(Entity)) continue; 

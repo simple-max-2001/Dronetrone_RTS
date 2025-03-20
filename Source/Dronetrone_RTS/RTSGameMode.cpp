@@ -50,10 +50,9 @@ void ARTSGameMode::PreLogin(const FString& Options,
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
-    const int32 MaxPlayers = 1;
-    if (GetNumPlayers() >= MaxPlayers) 
+    if (GetNumPlayers() >= 1) 
     {
-        ErrorMessage = TEXT("Server is fullfilled!");
+        ErrorMessage = TEXT("Server is fulfilled!");
     }
 }
 
@@ -62,8 +61,7 @@ void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
     Super::PostLogin(NewPlayer);
 
     // Receive PlayerState of player
-    ARTSPlayerState* PlayerState = NewPlayer->GetPlayerState<ARTSPlayerState>();
-    if (PlayerState)
+    if (ARTSPlayerState* PlayerState = NewPlayer->GetPlayerState<ARTSPlayerState>())
     {
         // Assign owner id
         PlayerState->Setup(0);
@@ -72,17 +70,17 @@ void ARTSGameMode::PostLogin(APlayerController* NewPlayer)
     }
 }
 
-ERelationType ARTSGameMode::GetRelation(int32 owner_a, int32 owner_b) const
+ERelationType ARTSGameMode::GetRelation(int32 Owner_A, int32 Owner_B) const
 {
-	if (owner_a == owner_b) return ERelationType::Own;
+	if (Owner_A == Owner_B) return ERelationType::Own;
 
-	int32 owner_s = std::min(owner_a, owner_b);
-	int32 owner_g = std::max(owner_a, owner_b);
+	int32 Owner_S = std::min(Owner_A, Owner_B);
+	int32 Owner_G = std::max(Owner_A, Owner_B);
 
-	if (owner_s == 0 && owner_g == 1)
+	if (Owner_S == 0 && Owner_G == 1)
 		return ERelationType::Friend;
 
-	if ((owner_s == 0 || owner_s == 1) && owner_g == 2)
+	if ((Owner_S == 0 || Owner_S == 1) && Owner_G == 2)
 		return ERelationType::Foe;
 
 	return ERelationType::Neutral;

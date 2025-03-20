@@ -27,11 +27,11 @@ void ARTSGameState::BeginPlay()
 
         // Periodically check units list
         World->GetTimerManager().SetTimer(
-            UnitsCheckingHandle, // handle to cancel timer at a later time
-            this, // the owning object
-            &ARTSGameState::UpdateEntities, // function to call on elapsed
-            1.f, // float delay until elapsed
-            true); // looping?
+            EntitiesCheckingHandle,
+            this,
+            &ARTSGameState::UpdateEntities,
+            UpdatePeriod,
+            true);
     }
 }
 
@@ -40,12 +40,12 @@ void ARTSGameState::UpdateEntities()
     if (const UWorld* World = GetWorld())
     {
         // Check current units list for invalid
-        for (int32 i = Units.Num()-1; !Units.IsEmpty() && i >= 0; i--)
+        for (const auto& Unit : Units)
         {
             // Delete from units if it  isn't valid
-            if (!Units[i].IsValid())
+            if (!Unit.IsValid())
             {
-                Units.RemoveAt(i, 1, false);
+                Units.Remove(Unit);
             }
         }
         

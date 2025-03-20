@@ -24,11 +24,9 @@ public:
 
     void Setup(int32 Owner_ID);
 	
-	void UpdateUnits();
+	void UpdateEntities();
 
 	int32 GetOwnerID() const;
-
-	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits();
 
 	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
 
@@ -47,5 +45,7 @@ protected:
 	int32 OwnerID;
 
 	UPROPERTY()
-    FTimerHandle NetworkUpdateHandle;
+	float UpdatePeriod = .3f;
+
+	FTimerHandle UnitsCheckingHandle;
 };

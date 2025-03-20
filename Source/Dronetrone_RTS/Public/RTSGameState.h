@@ -41,5 +41,8 @@ protected:
     UFUNCTION()
     void OnRep_IsGamePaused();
 
-    FTimerHandle UnitsCheckingHandle;
+    UPROPERTY()
+    float UpdatePeriod = .3f;
+
+    FTimerHandle EntitiesCheckingHandle;
 };
