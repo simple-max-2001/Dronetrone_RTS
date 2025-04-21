@@ -34,7 +34,7 @@ void UCommModuleComponent::BeginPlay()
 		}
 	}
 
-	if (bIsSuper) bIsOnline = true;
+	if (bIsSuper) ConnectionInfo.bIsOnline = true;
 	
 }
 
@@ -42,34 +42,56 @@ void UCommModuleComponent::UpdateConnection()
 {
 	// If module works like relay
 	if (IsRelay()) return;
+
+	float* Power = new float;
 	
 	// Check if it has connection to current relay
-	if (bIsSuper || IsAvailableRelay())
+	if (bIsSuper || IsAvailableRelay(nullptr, Power))
 	{
-		if (!bIsOnline) bIsOnline = true;
+		if (!IsOnline()) ConnectionInfo.bIsOnline = true;
+		ConnectionInfo.Power = *Power;
 	}
 	else
 	{
 		// Try to find new relay
-		bIsOnline = FindNewRelay();
+		FindNewRelay();
 	}
 }
 
-bool UCommModuleComponent::FindNewRelay()
+void UCommModuleComponent::FindNewRelay()
 {
 	TArray<TSoftObjectPtr<UCommModuleComponent>> NearbyRelays = SearchRelays(true);
 
-	for (TSoftObjectPtr Relay : NearbyRelays)
+	if (!NearbyRelays.IsEmpty())
 	{
-		if (Relay.IsValid() && IsAvailableRelay(Relay.Get()))
+		// Select relay with highest power level
+		float HighestPower = WEAKEST_SIGNAL;
+		float* Power = new float(WEAKEST_SIGNAL);
+
+		TWeakObjectPtr<UCommModuleComponent> ChosenRelay;
+	
+		for (TSoftObjectPtr Relay : NearbyRelays)
 		{
-			CurrentRelay = TWeakObjectPtr<UCommModuleComponent>(Relay.Get());
-			return true;
+			if (IsAvailableRelay(Relay.Get(), Power) && (*Power > HighestPower))
+			{
+				ChosenRelay = TWeakObjectPtr<UCommModuleComponent>(Relay.Get());
+				HighestPower = *Power;
+			}
 		}
+
+		if (ChosenRelay.IsValid())
+		{
+			ConnectionInfo.bIsOnline = true;
+			ConnectionInfo.Relay = ChosenRelay;
+			ConnectionInfo.Power = HighestPower;
+			ConnectionInfo.Frequency = GetFrequency();
+		}
+
+		return;
 	}
 
-	CurrentRelay.Reset();
-	return false;
+	ConnectionInfo = FConnectionInfo{};
+	return;
 }
 
 TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::SearchRelays(const bool bCheckOwnership) const
@@ -89,7 +111,7 @@ TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::SearchRelays(
 
 	for (const AActor* Actor : OutActors)
 	{
-		if (const UCommModuleComponent* Relay = Actor->FindComponentByClass<UCommModuleComponent>(); Relay && Relay != this && Relay->IsOnline() && IsAvailable(Relay, true))
+		if (const UCommModuleComponent* Relay = Actor->FindComponentByClass<UCommModuleComponent>(); Relay && Relay != this && IsAvailableRelay(Relay))
 		{
 			Relays.Add(Relay);
 		}
@@ -98,11 +120,14 @@ TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::SearchRelays(
 	return Relays;
 }
 
-bool UCommModuleComponent::IsAvailable(const UCommModuleComponent* Other, bool bBidirectional) const
+bool UCommModuleComponent::IsAvailable(const UCommModuleComponent* Other, bool bBidirectional, float* Power) const
 {
 	// If got nullptr or address is same, return false
 	if (!Other || Other == this) return false;
 
+	// If communicator module is disabled, return false
+	if (!Other->IsEnabled()) return false;
+	
 	// Check if owners of communication modules are valid
 	const TWeakObjectPtr<AActor> OwnActor = GetOwner();
 	const TWeakObjectPtr<AActor> OtherActor = Other->GetOwner();
@@ -115,9 +140,11 @@ bool UCommModuleComponent::IsAvailable(const UCommModuleComponent* Other, bool b
 			!OwnEntity || !OtherEntity || !OwnEntity->IsFriend(OtherEntity)) return false;
 	
 		// If power of received signal is less than receiver sensitivity, return false
-		if (GetSignalPower(Other, GetFrequency(), true) < GetReceiverSensitivity() &&
+		float receiverPower = GetSignalPower(Other, GetFrequency(), true);
+		if (receiverPower < GetReceiverSensitivity() &&
 			(bBidirectional && GetSignalPower(Other, GetFrequency(), false) < GetReceiverSensitivity())) return false;
-	
+
+		if (Power) *Power = receiverPower;
 		return true;
 	}
 
@@ -125,29 +152,29 @@ bool UCommModuleComponent::IsAvailable(const UCommModuleComponent* Other, bool b
 
 }
 
-bool UCommModuleComponent::IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional) const
+bool UCommModuleComponent::IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional, float* Power) const
 {
 	if (!Other.IsValid()) return false;
 
-	return IsAvailable(Other.Get());
+	return IsAvailable(Other.Get(), bBidirectional, Power);
 }
 
-bool UCommModuleComponent::IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional) const
+bool UCommModuleComponent::IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional, float* Power) const
 {
 	if (!Other.IsValid() || Other.IsPending()) return false;
 
-	return IsAvailable(Other.Get());
+	return IsAvailable(Other.Get(), bBidirectional, Power);
 }
 
-bool UCommModuleComponent::IsAvailableRelay(const UCommModuleComponent* Other) const
+bool UCommModuleComponent::IsAvailableRelay(const UCommModuleComponent* Other, float* Power) const
 {
 	// Make reference to relay for checking connection
-	const UCommModuleComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
+	const UCommModuleComponent* Relay = Other ? Other : ConnectionInfo.Relay.IsValid() ? ConnectionInfo.Relay.Get() : nullptr;
 
 	// If relay is not given, or it is not connected, return false
 	if (!Relay || !Relay->IsOnline() || !Relay->IsRelay()) return false;
 	
-	return IsAvailable(Relay, true);
+	return IsAvailable(Relay, true, Power);
 }
 
 float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
@@ -156,8 +183,8 @@ float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
 	// If another module is null pointer, try to refer to current relay
 	if (!Other)
 	{
-		if (CurrentRelay.IsValid())
-			Other = CurrentRelay.Get();
+		if (ConnectionInfo.Relay.IsValid())
+			Other = ConnectionInfo.Relay.Get();
 		else
 			return WEAKEST_SIGNAL;
 	}
@@ -211,18 +238,17 @@ float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
 
 void UCommModuleComponent::DrawConnectionLine(const float LifeTime) const
 {
-	if (!bIsOnline) return;
-
+	if (!ConnectionInfo.bIsOnline) return;
 
 	if (const UWorld* World = GetWorld())
 	{
-		if (!CurrentRelay.IsValid()) return;
+		if (!ConnectionInfo.Relay.IsValid()) return;
 		
 		const FVector ReceiverSelf = GetReceiverAntenna()->GetComponentLocation();
 		const FVector TransmitterSelf = GetTransmitterAntenna()->GetComponentLocation();
 	
-		const FVector ReceiverOther = CurrentRelay->GetReceiverAntenna()->GetComponentLocation();
-		const FVector TransmitterOther = CurrentRelay->GetTransmitterAntenna()->GetComponentLocation();
+		const FVector ReceiverOther = ConnectionInfo.Relay->GetReceiverAntenna()->GetComponentLocation();
+		const FVector TransmitterOther = ConnectionInfo.Relay->GetTransmitterAntenna()->GetComponentLocation();
 		
 		DrawDebugLine(World, TransmitterOther, ReceiverSelf, FColor::Green, false, LifeTime);
 		DrawDebugLine(World, TransmitterSelf, ReceiverOther, FColor::Green, false, LifeTime);

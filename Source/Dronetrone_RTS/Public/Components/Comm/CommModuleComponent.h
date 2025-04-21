@@ -18,18 +18,21 @@ struct FConnectionInfo
 {
 	GENERATED_BODY()
 
-	// I
-	UPROPERTY(BlueprintReadWrite)
+	// If module is connected 
+	UPROPERTY(BlueprintReadOnly)
 	bool bIsOnline = false;
 
-	UPROPERTY(BlueprintReadWrite)
-	TSoftObjectPtr<UCommModuleComponent> Relay;
+	// Connected relay
+	UPROPERTY(BlueprintReadOnly)
+	TWeakObjectPtr<UCommModuleComponent> Relay;
 
-	UPROPERTY(BlueprintReadWrite)
-	float InputPower = WEAKEST_SIGNAL;
-	
-	UPROPERTY(BlueprintReadWrite)
-	float OutputPower = WEAKEST_SIGNAL;
+	// Receiver power level, dBm
+	UPROPERTY(BlueprintReadOnly)
+	float Power = WEAKEST_SIGNAL;
+
+	// Communication frequency, GHz
+	UPROPERTY(BlueprintReadOnly)
+	float Frequency = 0;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -52,21 +55,19 @@ public:
 
 	// Find new relay if module is offline 
 	UFUNCTION(BlueprintCallable)
-	virtual bool FindNewRelay();
+	virtual void FindNewRelay();
 
 	// Check if another communication module is available
-	virtual bool IsAvailable(const UCommModuleComponent* Other, bool bBidirectional = true) const;
+	virtual bool IsAvailable(const UCommModuleComponent* Other, bool bBidirectional = true, float* Power = nullptr) const;
 	
 	// Check if another communication module is available
-	virtual bool IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true) const;
+	virtual bool IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true, float* Power = nullptr) const;
 
 	// Check if another communication module is available
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual bool IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true) const;
+	virtual bool IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true, float* Power = nullptr) const;
 	
 	// Check if another communication module is available as relay
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual bool IsAvailableRelay(const UCommModuleComponent* Other = nullptr) const;
+	virtual bool IsAvailableRelay(const UCommModuleComponent* Other = nullptr, float* Power = nullptr) const;
 
 	// Get list of available relays
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -78,7 +79,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
 	virtual bool IsOnline() const
 	{
-		return bIsOnline;
+		return ConnectionInfo.bIsOnline;
 	}
 	
 	// Get if communicator is enabled
@@ -130,6 +131,13 @@ public:
 		return CommFrequency;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual FConnectionInfo GetConnectionInfo() const
+	{
+		return FConnectionInfo(ConnectionInfo);
+	}
+	
+
 	// Calculate power of received signal, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
 	float GetSignalPower(const UCommModuleComponent* Other = nullptr, float Frequency = 0, const bool bSelfIsReceiver = true, const bool bCheckCollisions = true) const;
@@ -140,9 +148,6 @@ public:
 	void DrawConnectionLine(const float LifeTime = .2f) const;
 
 protected:
-	// If module is online
-	bool bIsOnline = false;
-
 	// Receiver sensitivity without jamming, dBm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float ReceiverSensitivity = -42.f;
@@ -158,9 +163,6 @@ protected:
 	// Maximum search distance for other communication modules, cm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float MaxSearchDistance = 1e4f;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Communication")
-	TWeakObjectPtr<const UCommModuleComponent> CurrentRelay;
 
 	// Reference to receiver antenna component
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -185,6 +187,8 @@ protected:
 	// Set if communication module can operate as relay
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Relay")
 	bool bIsRelay = false;
+
+	FConnectionInfo ConnectionInfo;
 
 	// Handler for updating connection
 	FTimerHandle ConnectionCheckHandle;
