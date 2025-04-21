@@ -7,10 +7,30 @@
 #include "TimerManager.h"
 
 #include "AntennaComponent.h"
+#include "RTSTypes.h"
 
 #include "CommModuleComponent.generated.h"
 
-class UCommRelayComponent;
+class DRONETRONE_RTS_API UCommModuleComponent;
+
+USTRUCT(BlueprintType)
+struct FConnectionInfo
+{
+	GENERATED_BODY()
+
+	// I
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsOnline = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	TSoftObjectPtr<UCommModuleComponent> Relay;
+
+	UPROPERTY(BlueprintReadWrite)
+	float InputPower = WEAKEST_SIGNAL;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float OutputPower = WEAKEST_SIGNAL;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRONETRONE_RTS_API UCommModuleComponent : public UActorComponent
@@ -26,54 +46,102 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	
-	UFUNCTION(BlueprintCallable)
-	bool IsConnected() const;
-	
+	// Update connection status of module
 	UFUNCTION(BlueprintCallable)
 	virtual void UpdateConnection();
 
+	// Find new relay if module is offline 
 	UFUNCTION(BlueprintCallable)
 	virtual bool FindNewRelay();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual bool CheckRelay(const UCommRelayComponent* Other = nullptr) const;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual bool CanCommunicateWithModule(const UCommModuleComponent* Other, bool bBidirectional = true, bool bCheckOwnership = true) const;
+	// Check if another communication module is available
+	virtual bool IsAvailable(const UCommModuleComponent* Other, bool bBidirectional = true) const;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual TArray<TSoftObjectPtr<UCommModuleComponent>> GetAvailableComms(const bool bCheckOwnership) const;
+	// Check if another communication module is available
+	virtual bool IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true) const;
 
+	// Check if another communication module is available
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual TArray<TSoftObjectPtr<UCommRelayComponent>> GetAvailableRelays(const bool bCheckOwnership) const;
+	virtual bool IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional = true) const;
+	
+	// Check if another communication module is available as relay
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual bool IsAvailableRelay(const UCommModuleComponent* Other = nullptr) const;
 
+	// Get list of available relays
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	virtual TArray<TSoftObjectPtr<UCommModuleComponent>> SearchRelays(const bool bCheckOwnership) const;
+	
+	// --- Getters ---
+
+	// Get if communicator is online
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual bool IsOnline() const
+	{
+		return bIsOnline;
+	}
+	
+	// Get if communicator is enabled
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual float IsEnabled() const
+	{
+		return bIsEnabled;
+	}
+
+	// Get if communicator is relay
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual float IsRelay() const
+	{
+		return bIsRelay;
+	}
+	
 	// Get receiver sensitivity, dBm
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual float GetReceiverSensitivity() const;
-
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual float GetReceiverSensitivity() const
+	{
+		return ReceiverSensitivity;
+	}
+	
 	// Get transmitter power, dBm
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual float GetTransmitterPower() const;
-
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual float GetTransmitterPower() const
+	{
+		return TransmitterPower;
+	}
+	
 	// Get receiver antenna component reference
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TSoftObjectPtr<UAntennaComponent> GetReceiverAntenna() const;
-
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	TSoftObjectPtr<UAntennaComponent> GetReceiverAntenna() const
+	{
+		return TSoftObjectPtr<UAntennaComponent>(ReceiverAntenna);
+	}
+	
 	// Get transmitter antenna component reference
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TSoftObjectPtr<UAntennaComponent> GetTransmitterAntenna() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	TSoftObjectPtr<UAntennaComponent> GetTransmitterAntenna() const
+	{
+		return TSoftObjectPtr<UAntennaComponent>(TransmitterAntenna);
+	}
 
 	// Get communication frequency, GHz
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	virtual float GetFrequency() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
+	virtual float GetFrequency() const
+	{
+		return CommFrequency;
+	}
 
 	// Calculate power of received signal, dBm
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
 	float GetSignalPower(const UCommModuleComponent* Other = nullptr, float Frequency = 0, const bool bSelfIsReceiver = true, const bool bCheckCollisions = true) const;
+	// --- End getters ---
+
+	// Draw line between antennas
+	UFUNCTION(BlueprintCallable, Category = "Communication")
+	void DrawConnectionLine(const float LifeTime = .2f) const;
 
 protected:
-	bool bIsConnected = false;
+	// If module is online
+	bool bIsOnline = false;
 
 	// Receiver sensitivity without jamming, dBm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -82,14 +150,6 @@ protected:
 	// Transmitter power, dBm
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
 	float TransmitterPower = 33.f;
-
-	// Receiver antenna gain, dBi
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float ReceiverGain = 0.f;
-
-	// Transmitter antenna gain, dBi
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
-	float TransmitterGain = 0.f;
 
 	// Communication frequency, GHz
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -100,7 +160,7 @@ protected:
 	float MaxSearchDistance = 1e4f;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Communication")
-	TWeakObjectPtr<const UCommRelayComponent> CurrentRelay;
+	TWeakObjectPtr<const UCommModuleComponent> CurrentRelay;
 
 	// Reference to receiver antenna component
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Communication")
@@ -114,5 +174,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Communication")
 	float ConnectionUpdatePeriod = .2f;
 
+	// Set if communication module is enabled
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Communication")
+	bool bIsEnabled = true;
+
+	// Set if communication module is always online and don't need any relay
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Communication")
+	bool bIsSuper = false;
+	
+	// Set if communication module can operate as relay
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Relay")
+	bool bIsRelay = false;
+
+	// Handler for updating connection
 	FTimerHandle ConnectionCheckHandle;
 };

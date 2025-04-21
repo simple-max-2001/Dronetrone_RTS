@@ -54,6 +54,23 @@ void ARTSPlayerState::UpdateEntities()
         UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
         UE_LOG(LogTemp, Log, TEXT("Found buildings for OwnerID %d: %d"), OwnerID, Buildings.Num());
     }
+
+    // Get list of player's relays
+    Relays.Empty();
+    
+    for (const auto& Unit : Units)
+    {
+        if (const auto* Relay = Unit->FindComponentByClass<UCommModuleComponent>())
+            if (Relay->IsRelay()) Relays.Add(Relay);
+    }
+    
+    for (const auto& Building : Buildings)
+    {
+        if (const auto* Relay = Building->FindComponentByClass<UCommModuleComponent>())
+            if (Relay->IsRelay()) Relays.Add(Relay);
+    }
+
+    // TODO: Implement BFS for checking connection
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits() const

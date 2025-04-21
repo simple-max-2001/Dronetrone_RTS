@@ -7,7 +7,7 @@
 
 #include "Buildings/BaseBuilding.h"
 #include "Units/BaseUnit.h"
-#include "Components/Comm/CommRelayComponent.h"
+#include "Components/Comm/CommModuleComponent.h"
 
 #include "RTSPlayerState.generated.h"
 
@@ -39,7 +39,7 @@ protected:
 	TArray<TSoftObjectPtr<ABaseBuilding>> Buildings;
 	
 	UPROPERTY()
-	TArray<TSoftObjectPtr<UCommRelayComponent>> Relays;
+	TArray<TSoftObjectPtr<UCommModuleComponent>> Relays;
 
     UPROPERTY()
 	int32 OwnerID;

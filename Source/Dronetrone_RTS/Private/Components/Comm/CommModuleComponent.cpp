@@ -6,11 +6,10 @@
 
 #include "RTSTypes.h"
 #include "Components/EntityComponent.h"
-#include "Components/Comm/CommRelayComponent.h"
 
 // Sets default values for this component's properties
 UCommModuleComponent::UCommModuleComponent()
-{
+{	
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
@@ -34,37 +33,37 @@ void UCommModuleComponent::BeginPlay()
 				true); // looping?
 		}
 	}
-	
-}
 
-bool UCommModuleComponent::IsConnected() const
-{
-	return bIsConnected;
+	if (bIsSuper) bIsOnline = true;
+	
 }
 
 void UCommModuleComponent::UpdateConnection()
 {
+	// If module works like relay
+	if (IsRelay()) return;
+	
 	// Check if it has connection to current relay
-	if (CurrentRelay.IsValid() && CheckRelay(CurrentRelay.Get()))
+	if (bIsSuper || IsAvailableRelay())
 	{
-		bIsConnected = true;
+		if (!bIsOnline) bIsOnline = true;
 	}
 	else
 	{
 		// Try to find new relay
-		bIsConnected = FindNewRelay();
+		bIsOnline = FindNewRelay();
 	}
 }
 
 bool UCommModuleComponent::FindNewRelay()
 {
-	TArray<TSoftObjectPtr<UCommRelayComponent>> NearbyRelays = GetAvailableRelays(true);
+	TArray<TSoftObjectPtr<UCommModuleComponent>> NearbyRelays = SearchRelays(true);
 
 	for (TSoftObjectPtr Relay : NearbyRelays)
 	{
-		if (Relay.IsValid() && CheckRelay(Relay.Get()))
+		if (Relay.IsValid() && IsAvailableRelay(Relay.Get()))
 		{
-			CurrentRelay = TWeakObjectPtr<UCommRelayComponent>(Relay.Get());
+			CurrentRelay = TWeakObjectPtr<UCommModuleComponent>(Relay.Get());
 			return true;
 		}
 	}
@@ -73,11 +72,10 @@ bool UCommModuleComponent::FindNewRelay()
 	return false;
 }
 
-
-TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::GetAvailableComms(const bool bCheckOwnership) const
+TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::SearchRelays(const bool bCheckOwnership) const
 {
 	TArray<AActor*> OutActors;
-	TArray<TSoftObjectPtr<UCommModuleComponent>> Result;
+	TArray<TSoftObjectPtr<UCommModuleComponent>> Relays;
 
 	UKismetSystemLibrary::SphereOverlapActors(
 		GetWorld(),
@@ -91,33 +89,7 @@ TArray<TSoftObjectPtr<UCommModuleComponent>> UCommModuleComponent::GetAvailableC
 
 	for (const AActor* Actor : OutActors)
 	{
-		if (const UCommModuleComponent* Comm = Actor->FindComponentByClass<UCommModuleComponent>(); Comm && Comm != this && CanCommunicateWithModule(Comm, false, bCheckOwnership))
-		{
-			Result.Add(Comm);
-		}
-	}
-
-	return Result;
-}
-
-TArray<TSoftObjectPtr<UCommRelayComponent>> UCommModuleComponent::GetAvailableRelays(const bool bCheckOwnership) const
-{
-	TArray<AActor*> OutActors;
-	TArray<TSoftObjectPtr<UCommRelayComponent>> Relays;
-
-	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(),
-		GetOwner()->GetActorLocation(),
-		MaxSearchDistance,
-		TArray<TEnumAsByte<EObjectTypeQuery>>(),
-		AActor::StaticClass(),
-		TArray<AActor*>(),
-		OutActors
-	);
-
-	for (const AActor* Actor : OutActors)
-	{
-		if (const UCommRelayComponent* Relay = Actor->FindComponentByClass<UCommRelayComponent>(); Relay && Relay != this && Relay->IsConnected() && CanCommunicateWithModule(Relay, true, bCheckOwnership))
+		if (const UCommModuleComponent* Relay = Actor->FindComponentByClass<UCommModuleComponent>(); Relay && Relay != this && Relay->IsOnline() && IsAvailable(Relay, true))
 		{
 			Relays.Add(Relay);
 		}
@@ -126,18 +98,7 @@ TArray<TSoftObjectPtr<UCommRelayComponent>> UCommModuleComponent::GetAvailableRe
 	return Relays;
 }
 
-bool UCommModuleComponent::CheckRelay(const UCommRelayComponent* Other) const
-{
-	// Make reference to relay for checking connection
-	const UCommRelayComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
-
-	// If relay is not given, or it is not connected, return false
-	if (!Relay || !Relay->IsConnected()) return false;
-	
-	return CanCommunicateWithModule(Relay);
-}
-
-bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* Other, bool bBidirectional, bool bCheckOwnership) const
+bool UCommModuleComponent::IsAvailable(const UCommModuleComponent* Other, bool bBidirectional) const
 {
 	// If got nullptr or address is same, return false
 	if (!Other || Other == this) return false;
@@ -146,46 +107,47 @@ bool UCommModuleComponent::CanCommunicateWithModule(const UCommModuleComponent* 
 	const TWeakObjectPtr<AActor> OwnActor = GetOwner();
 	const TWeakObjectPtr<AActor> OtherActor = Other->GetOwner();
 
-	if (!OwnActor.IsValid() || !OtherActor.IsValid()) return false;
-
-	if (bCheckOwnership)
+	if (OwnActor.IsValid() && OtherActor.IsValid())
 	{
-		UEntityComponent* OtherEntity = GET_ENTITY(OtherActor);
+		UEntityComponent* OtherEntity = OtherActor->FindComponentByClass<UEntityComponent>();
 
-		if (const UEntityComponent* OwnEntity = GET_ENTITY(OwnActor);
+		if (const UEntityComponent* OwnEntity = OwnActor->FindComponentByClass<UEntityComponent>();
 			!OwnEntity || !OtherEntity || !OwnEntity->IsFriend(OtherEntity)) return false;
-	}
 	
-	// If power of received signal is less than receiver sensitivity, return false
-	if (GetSignalPower(Other, GetFrequency()) < GetReceiverSensitivity()) return false;
-	if (bBidirectional && GetSignalPower(Other, GetFrequency(), false) < GetReceiverSensitivity()) return false;
+		// If power of received signal is less than receiver sensitivity, return false
+		if (GetSignalPower(Other, GetFrequency(), true) < GetReceiverSensitivity() &&
+			(bBidirectional && GetSignalPower(Other, GetFrequency(), false) < GetReceiverSensitivity())) return false;
+	
+		return true;
+	}
 
-	return true;
+	return false;
+
 }
 
-float UCommModuleComponent::GetReceiverSensitivity() const
+bool UCommModuleComponent::IsAvailable(TWeakObjectPtr<const UCommModuleComponent> Other, bool bBidirectional) const
 {
-	return ReceiverSensitivity;
+	if (!Other.IsValid()) return false;
+
+	return IsAvailable(Other.Get());
 }
 
-float UCommModuleComponent::GetTransmitterPower() const
+bool UCommModuleComponent::IsAvailable(TSoftObjectPtr<const UCommModuleComponent> Other, bool bBidirectional) const
 {
-	return TransmitterPower;
+	if (!Other.IsValid() || Other.IsPending()) return false;
+
+	return IsAvailable(Other.Get());
 }
 
-TSoftObjectPtr<UAntennaComponent> UCommModuleComponent::GetReceiverAntenna() const
+bool UCommModuleComponent::IsAvailableRelay(const UCommModuleComponent* Other) const
 {
-	return TSoftObjectPtr<UAntennaComponent>(ReceiverAntenna);
-}
+	// Make reference to relay for checking connection
+	const UCommModuleComponent* Relay = Other ? Other : CurrentRelay.IsValid() ? CurrentRelay.Get() : nullptr;
 
-TSoftObjectPtr<UAntennaComponent> UCommModuleComponent::GetTransmitterAntenna() const
-{
-	return TSoftObjectPtr<UAntennaComponent>(TransmitterAntenna);
-}
-
-float UCommModuleComponent::GetFrequency() const
-{
-	return CommFrequency;
+	// If relay is not given, or it is not connected, return false
+	if (!Relay || !Relay->IsOnline() || !Relay->IsRelay()) return false;
+	
+	return IsAvailable(Relay, true);
 }
 
 float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
@@ -244,5 +206,26 @@ float UCommModuleComponent::GetSignalPower(const UCommModuleComponent* Other,
 	//	* c - speed of light, 3*10^10 cm/s
 	//	* f - signal frequency, Hz
 	//	* d - distance between transmitter and receiver antennas, cm
-	return Transmitter->GetTransmitterPower() + TransmitterA->GetAntennaGain(T2R) + ReceiverA->GetAntennaGain(-T2R) + 20 * log10f(30.f / (4 * PI * Frequency * Distance));
+	return Transmitter->GetTransmitterPower() + TransmitterAntenna->GetAntennaGain(T2R) + ReceiverAntenna->GetAntennaGain(-T2R) + 20 * log10f(30.f / (4 * PI * Frequency * Distance));
+}
+
+void UCommModuleComponent::DrawConnectionLine(const float LifeTime) const
+{
+	if (!bIsOnline) return;
+
+
+	if (const UWorld* World = GetWorld())
+	{
+		if (!CurrentRelay.IsValid()) return;
+		
+		const FVector ReceiverSelf = GetReceiverAntenna()->GetComponentLocation();
+		const FVector TransmitterSelf = GetTransmitterAntenna()->GetComponentLocation();
+	
+		const FVector ReceiverOther = CurrentRelay->GetReceiverAntenna()->GetComponentLocation();
+		const FVector TransmitterOther = CurrentRelay->GetTransmitterAntenna()->GetComponentLocation();
+		
+		DrawDebugLine(World, TransmitterOther, ReceiverSelf, FColor::Green, false, LifeTime);
+		DrawDebugLine(World, TransmitterSelf, ReceiverOther, FColor::Green, false, LifeTime);
+	}
+
 }
