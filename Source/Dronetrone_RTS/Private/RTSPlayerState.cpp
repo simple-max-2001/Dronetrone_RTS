@@ -11,23 +11,37 @@ ARTSPlayerState::ARTSPlayerState()
 void ARTSPlayerState::Setup(int32 Owner_ID)
 {
     OwnerID = Owner_ID;
+    
+    if (const UWorld* World = GetWorld())
+    {
+        UpdateEntities();
 
-    UpdateEntities();
+        // Periodically check units list
+        World->GetTimerManager().SetTimer(
+            UpdateEntitiesHandle,
+            this,
+            &ARTSPlayerState::UpdateEntities,
+            UpdatePeriod,
+            true);
+    }
 }
 
 void ARTSPlayerState::UpdateEntities()
 {
-    // Remove all invalid units
-    for (const auto& Unit : Units)
-    {
-        if (!Unit.IsValid()) Units.Remove(Unit);
-    }
+    Units.Empty();
+    Buildings.Empty();
     
-    // Remove all invalid buildings
-    for (const auto& Building : Buildings)
-    {
-        if (!Building.IsValid()) Buildings.Remove(Building);
-    }
+    // // Remove all invalid units
+    // for (const auto& Unit : Units)
+    // {
+    //     if (!Unit.IsValid()) Units.Remove(Unit);
+    // }
+    //
+    // // Remove all invalid buildings
+    // for (const auto& Building : Buildings)
+    // {
+    //     if (!Building.IsValid()) Buildings.Remove(Building);
+    // }
 
     if (const ARTSGameState* GS = GetWorld()->GetGameState<ARTSGameState>())
     {
@@ -35,7 +49,7 @@ void ARTSPlayerState::UpdateEntities()
         for (TSoftObjectPtr Unit : GS->GetAllUnits())
         {
             // Skip this unit if it is not belong to players faction
-            if (!Unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
+            if (!Unit.IsValid() && !Unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If unit is not in our list, add it
             if (!Units.Contains(Unit)) Units.Add(Unit);
@@ -45,7 +59,7 @@ void ARTSPlayerState::UpdateEntities()
         for (TSoftObjectPtr Building : GS->GetAllBuildings())
         {
             // Skip this building if it is not belong to players faction
-            if (!Building->EntityComponent->IsOwnedBy(OwnerID)) continue;
+            if (!Building.IsValid() && !Building->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If building is not in our list, add it
             if (!Buildings.Contains(Building)) Buildings.Add(Building);
@@ -54,23 +68,6 @@ void ARTSPlayerState::UpdateEntities()
         UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
         UE_LOG(LogTemp, Log, TEXT("Found buildings for OwnerID %d: %d"), OwnerID, Buildings.Num());
     }
-
-    // Get list of player's relays
-    Relays.Empty();
-    
-    for (const auto& Unit : Units)
-    {
-        if (const auto* Relay = Unit->FindComponentByClass<UCommModuleComponent>())
-            if (Relay->IsRelay()) Relays.Add(Relay);
-    }
-    
-    for (const auto& Building : Buildings)
-    {
-        if (const auto* Relay = Building->FindComponentByClass<UCommModuleComponent>())
-            if (Relay->IsRelay()) Relays.Add(Relay);
-    }
-
-    // TODO: Implement BFS for checking connection
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits() const

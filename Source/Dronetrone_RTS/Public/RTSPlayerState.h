@@ -37,9 +37,6 @@ protected:
 	
 	UPROPERTY()
 	TArray<TSoftObjectPtr<ABaseBuilding>> Buildings;
-	
-	UPROPERTY()
-	TArray<TSoftObjectPtr<UCommModuleComponent>> Relays;
 
     UPROPERTY()
 	int32 OwnerID;
@@ -47,5 +44,5 @@ protected:
 	UPROPERTY()
 	float UpdatePeriod = .3f;
 
-	FTimerHandle UnitsCheckingHandle;
+	FTimerHandle UpdateEntitiesHandle;
 };

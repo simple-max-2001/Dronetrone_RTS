@@ -39,25 +39,28 @@ void ARTSGameState::UpdateEntities()
 {
     if (const UWorld* World = GetWorld())
     {
-        // Check current units list for invalid
-        for (const auto& Unit : Units)
-        {
-            // Delete from units if it  isn't valid
-            if (!Unit.IsValid())
-            {
-                Units.Remove(Unit);
-            }
-        }
+        Units.Empty();
+        Buildings.Empty();
         
-        // Check current buildings list for invalid
-        for (int32 i = Buildings.Num()-1; !Buildings.IsEmpty() && i >= 0; i--)
-        {
-            // Delete from buildings if it isn't valid
-            if (!Buildings[i].IsValid())
-            {
-                Buildings.RemoveAt(i, 1, false);
-            }
-        }
+        // // Check current units list for invalid
+        // for (const auto& Unit : Units)
+        // {
+        //     // Delete from units if it  isn't valid
+        //     if (!Unit.IsValid() || !Unit->EntityComponent->IsAlive())
+        //     {
+        //         Units.Remove(Unit);
+        //     }
+        // }
+        //
+        // // Check current buildings list for invalid
+        // for (const auto& Building : Buildings)
+        // {
+        //     // Delete from buildings if it isn't valid
+        //     if (!Building.IsValid() || !Building->EntityComponent->IsAlive())
+        //     {
+        //         Buildings.Remove(Building);
+        //     }
+        // }
     
         // Get all actors of unit and building class
         TArray<AActor*> FoundUnits;
@@ -66,37 +69,52 @@ void ARTSGameState::UpdateEntities()
         UGameplayStatics::GetAllActorsOfClass(World, ABaseUnit::StaticClass(), FoundUnits);
         UGameplayStatics::GetAllActorsOfClass(World, ABaseBuilding::StaticClass(), FoundBuildings);
 
-        for (int32 i = 0; i < FoundUnits.Num(); i++)
+        for (const auto& Actor : FoundUnits)
         {
             // Add to units list if it is valid and not in list yet
-            if (TSoftObjectPtr<ABaseUnit> Unit = Cast<ABaseUnit>(FoundUnits[i]); Unit.IsValid() && Units.Contains(Unit))
-            {
-                Units.Add(Unit);
-            }
+            // TSoftObjectPtr<ABaseUnit> Unit = Cast<ABaseUnit>(Actor);
+            // if (Unit.IsValid())
+            //     if (Unit->EntityComponent->IsAlive())
+            //         Units.Add(Unit);
+            
+            if (TSoftObjectPtr<ABaseUnit> Unit = Cast<ABaseUnit>(Actor);
+                Unit.IsValid() &&
+                Unit->EntityComponent->IsAlive() &&
+                !Units.Contains(Unit))
+                    Units.Add(Unit);
         }
 
-        for (int32 i = 0; i < FoundBuildings.Num(); i++)
+        for (const auto& Actor : FoundBuildings)
         {
             // Add to buildings list if it is valid and not in list yet
-            if (TSoftObjectPtr<ABaseBuilding> Building = Cast<ABaseUnit>(FoundBuildings[i]); Building.IsValid() && Buildings.Contains(Building))
-            {
-                Buildings.Add(Building);
-            }
+            // TSoftObjectPtr<ABaseBuilding> Building = Cast<ABaseBuilding>(Actor);
+            // if (Building.IsValid())
+            //     if (Building->EntityComponent->IsAlive())
+            //         Buildings.Add(Building);
+                
+            if (TSoftObjectPtr<ABaseBuilding> Building = Cast<ABaseBuilding>(Actor);
+                Building.IsValid() &&
+                Building->EntityComponent->IsAlive() &&
+                !Buildings.Contains(Building))
+                    Buildings.Add(Building);
         }
 
         UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
         UE_LOG(LogTemp, Log, TEXT("Found buildings on map: %d"), FoundBuildings.Num());
+
+        UE_LOG(LogTemp, Log, TEXT("Units in list: %d"), Units.Num());
+        UE_LOG(LogTemp, Log, TEXT("Buildings in list: %d"), Buildings.Num());
     }
 }
 
 TArray<TSoftObjectPtr<ABaseUnit>> ARTSGameState::GetAllUnits() const
 {
-    return Units;
+    return TArray(Units);
 }
 
 TArray<TSoftObjectPtr<ABaseBuilding>> ARTSGameState::GetAllBuildings() const
 {
-    return Buildings;
+    return TArray(Buildings);
 }
 
 void ARTSGameState::OnRep_IsGamePaused()

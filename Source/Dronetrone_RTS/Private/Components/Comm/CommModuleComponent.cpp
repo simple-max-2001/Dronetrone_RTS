@@ -40,10 +40,16 @@ void UCommModuleComponent::BeginPlay()
 
 void UCommModuleComponent::UpdateConnection()
 {
+	if (!IsEnabled())
+	{
+		if (IsOnline())	ConnectionInfo = FConnectionInfo{};
+		return;
+	}
+	
 	// If module works like relay
-	if (IsRelay()) return;
+	// if (IsRelay()) return;
 
-	float* Power = new float;
+	float* Power = new float(WEAKEST_SIGNAL);
 	
 	// Check if it has connection to current relay
 	if (bIsSuper || IsAvailableRelay(nullptr, Power))
