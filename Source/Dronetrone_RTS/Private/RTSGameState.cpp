@@ -99,11 +99,11 @@ void ARTSGameState::UpdateEntities()
                     Buildings.Add(Building);
         }
 
-        UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
-        UE_LOG(LogTemp, Log, TEXT("Found buildings on map: %d"), FoundBuildings.Num());
-
-        UE_LOG(LogTemp, Log, TEXT("Units in list: %d"), Units.Num());
-        UE_LOG(LogTemp, Log, TEXT("Buildings in list: %d"), Buildings.Num());
+        // UE_LOG(LogTemp, Log, TEXT("Found units on map: %d"), FoundUnits.Num());
+        // UE_LOG(LogTemp, Log, TEXT("Found buildings on map: %d"), FoundBuildings.Num());
+        //
+        // UE_LOG(LogTemp, Log, TEXT("Units in list: %d"), Units.Num());
+        // UE_LOG(LogTemp, Log, TEXT("Buildings in list: %d"), Buildings.Num());
     }
 }
 

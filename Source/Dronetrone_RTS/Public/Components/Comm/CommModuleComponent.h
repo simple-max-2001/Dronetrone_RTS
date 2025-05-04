@@ -84,14 +84,14 @@ public:
 	
 	// Get if communicator is enabled
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
-	virtual float IsEnabled() const
+	virtual bool IsEnabled() const
 	{
 		return bIsEnabled;
 	}
 
-	// Get if communicator is relay
+	// Get if communicator can act as relay
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")
-	virtual float IsRelay() const
+	virtual bool IsRelay() const
 	{
 		return bIsRelay;
 	}
@@ -136,7 +136,6 @@ public:
 	{
 		return FConnectionInfo(ConnectionInfo);
 	}
-	
 
 	// Calculate power of received signal, dBm
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Communication")

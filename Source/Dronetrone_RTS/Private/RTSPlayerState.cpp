@@ -30,18 +30,6 @@ void ARTSPlayerState::UpdateEntities()
 {
     Units.Empty();
     Buildings.Empty();
-    
-    // // Remove all invalid units
-    // for (const auto& Unit : Units)
-    // {
-    //     if (!Unit.IsValid()) Units.Remove(Unit);
-    // }
-    //
-    // // Remove all invalid buildings
-    // for (const auto& Building : Buildings)
-    // {
-    //     if (!Building.IsValid()) Buildings.Remove(Building);
-    // }
 
     if (const ARTSGameState* GS = GetWorld()->GetGameState<ARTSGameState>())
     {
@@ -52,7 +40,7 @@ void ARTSPlayerState::UpdateEntities()
             if (!Unit.IsValid() && !Unit->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If unit is not in our list, add it
-            if (!Units.Contains(Unit)) Units.Add(Unit);
+            Units.Add(Unit);
         }
 
         // Add new buildings if they appeared
@@ -62,20 +50,10 @@ void ARTSPlayerState::UpdateEntities()
             if (!Building.IsValid() && !Building->EntityComponent->IsOwnedBy(OwnerID)) continue;
 
             // If building is not in our list, add it
-            if (!Buildings.Contains(Building)) Buildings.Add(Building);
+            Buildings.Add(Building);
         }
 
-        UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
-        UE_LOG(LogTemp, Log, TEXT("Found buildings for OwnerID %d: %d"), OwnerID, Buildings.Num());
+        // UE_LOG(LogTemp, Log, TEXT("Found units for OwnerID %d: %d"), OwnerID, Units.Num());
+        // UE_LOG(LogTemp, Log, TEXT("Found buildings for OwnerID %d: %d"), OwnerID, Buildings.Num());
     }
-}
-
-TArray<TSoftObjectPtr<ABaseUnit>> ARTSPlayerState::GetAllUnits() const
-{
-    return Units;
-}
-
-int32 ARTSPlayerState::GetOwnerID() const
-{
-    return OwnerID;
 }

@@ -2,15 +2,23 @@
 
 #include "UI/UnitIconWidget.h"
 
-void UUnitIconWidget::SetUnit(TWeakObjectPtr<ABaseUnit> unit)
+void UUnitIconWidget::SetUnit(TWeakObjectPtr<ABaseUnit> NewUnit)
 {
-    if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.RemoveDynamic(this, &UUnitIconWidget::UpdateUnitInfo);
+    UE_LOG(LogTemp, Display, TEXT("Setting up unit"));
+    if (Unit.IsValid())
+    {
+        UE_LOG(LogTemp, Display, TEXT("OnRemoveDelegates.Broadcast()"));
+        OnRemoveDelegates.Broadcast();
+    }
+    
+    Unit = NewUnit;
 
-    Unit = unit;
-
-    if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.AddDynamic(this, &UUnitIconWidget::UpdateUnitInfo);
-
-    UpdateUnitInfo();
+    if (NewUnit.IsValid())
+    {
+        UE_LOG(LogTemp, Display, TEXT("OnCreateDelegates.Broadcast()"));
+        OnCreateDelegates.Broadcast();
+    }
+    CheckUnit();
 }
 
 void UUnitIconWidget::SetSelectionManager(TWeakObjectPtr<ASelectionManager> selection_manager)
@@ -18,26 +26,16 @@ void UUnitIconWidget::SetSelectionManager(TWeakObjectPtr<ASelectionManager> sele
     SelectionManager = selection_manager;
 }
 
-void UUnitIconWidget::UpdateUnitInfo()
+void UUnitIconWidget::CheckUnit()
 {
-    if (!Unit.IsValid()) RemoveFromParent();
-
-    // Update unit icon
-    UTexture2D* unit_icon = Unit->GetUnitIcon();
-    if (UnitImage && unit_icon)
-    {
-        UnitImage->SetBrushFromTexture(unit_icon);
-    }
-
-    // Update unit health bar
-    if (HealthBar) HealthBar->SetPercent(Unit->HealthComponent->GetHealthPercentage());
+    if (!Unit.IsValid() || !Unit->EntityComponent->IsAlive()) RemoveFromParent();
 }
 
 void UUnitIconWidget::NativeDestruct()
 {
     Super::NativeDestruct();
     
-    if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.RemoveDynamic(this, &UUnitIconWidget::UpdateUnitInfo);
+    if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.RemoveDynamic(this, &UUnitIconWidget::CheckUnit);
 }
 
 FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

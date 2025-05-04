@@ -26,9 +26,20 @@ public:
 	
 	void UpdateEntities();
 
-	int32 GetOwnerID() const;
+	int32 GetOwnerID() const
+	{
+		return OwnerID;
+	}
 
-	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
+	TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const
+	{
+		return TArray(Units);
+	}
+
+	TArray<TSoftObjectPtr<ABaseBuilding>> GetAllBuildings() const
+	{
+		return TArray(Buildings);
+	}
 
 protected:
 	//UPROPERTY(ReplicatedUsing=OnRep_OwnedUnits)
