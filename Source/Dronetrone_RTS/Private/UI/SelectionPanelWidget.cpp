@@ -32,9 +32,16 @@ void USelectionPanelWidget::UpdateSelection()
         UUnitIconWidget* UnitIcon = CreateWidget<UUnitIconWidget>(this, UnitIconWidgetClass);
         if (UnitIcon)
         {
+            if (MaxColumns == 0) {
+                MaxColumns = 1;
+            }
+            else if (MaxColumns < 0) {
+                MaxColumns *= -1;
+            }
+            
             UnitIcon->SetUnit(SelectedUnits[i]);
             UnitIcon->SetSelectionManager(SelectionManager);
-            UnitGridPanel->AddChildToUniformGrid(UnitIcon, i / 4, i % 4);
+            UnitGridPanel->AddChildToUniformGrid(UnitIcon, i / MaxColumns, i % MaxColumns);
         }
     }
 }

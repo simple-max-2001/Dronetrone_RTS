@@ -35,6 +35,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TWeakObjectPtr<ASelectionManager> SelectionManager;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int MaxColumns = 4;
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUnitIconWidget> UnitIconWidgetClass;
 	

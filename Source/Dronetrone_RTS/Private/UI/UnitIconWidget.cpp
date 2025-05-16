@@ -28,14 +28,18 @@ void UUnitIconWidget::SetSelectionManager(TWeakObjectPtr<ASelectionManager> sele
 
 void UUnitIconWidget::CheckUnit()
 {
-    if (!Unit.IsValid() || !Unit->EntityComponent->IsAlive()) RemoveFromParent();
+    if (!Unit.IsValid() || !Unit->EntityComponent->IsAlive())
+    {
+        RemoveFromParent();
+        Destruct();
+    }
 }
 
 void UUnitIconWidget::NativeDestruct()
 {
     Super::NativeDestruct();
-    
-    if (Unit.IsValid()) Unit->HealthComponent->OnHealthChanged.RemoveDynamic(this, &UUnitIconWidget::CheckUnit);
+
+    OnRemoveDelegates.Broadcast();
 }
 
 FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -45,9 +49,6 @@ FReply UUnitIconWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
     // Check if the left mouse button was pressed
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
-        // Handle the left mouse button down event
-        UE_LOG(LogTemp, Warning, TEXT("Left mouse button down!"));
-
         if (SelectionManager.IsValid() && Unit.IsValid())
         {
             SelectionManager->Select(Unit);
