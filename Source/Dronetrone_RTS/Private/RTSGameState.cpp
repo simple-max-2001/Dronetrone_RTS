@@ -119,15 +119,5 @@ TArray<TSoftObjectPtr<ABaseBuilding>> ARTSGameState::GetAllBuildings() const
 
 void ARTSGameState::OnRep_IsGamePaused()
 {
-    if (const UWorld* World = GetWorld())
-    {
-        if (bIsGamePaused)
-        {
-            UGameplayStatics::SetGamePaused(World, true);
-        }
-        else
-        {
-            UGameplayStatics::SetGamePaused(World, false);
-        }
-    }
+    if (const UWorld* World = GetWorld()) UGameplayStatics::SetGamePaused(World, bIsGamePaused);
 }

@@ -4,20 +4,12 @@
 
 void UUnitIconWidget::SetUnit(TWeakObjectPtr<ABaseUnit> NewUnit)
 {
-    UE_LOG(LogTemp, Display, TEXT("Setting up unit"));
-    if (Unit.IsValid())
-    {
-        UE_LOG(LogTemp, Display, TEXT("OnRemoveDelegates.Broadcast()"));
-        OnRemoveDelegates.Broadcast();
-    }
+    if (Unit.IsValid()) OnRemoveDelegates.Broadcast();
+
+    if (!NewUnit.IsValid()) return;
     
     Unit = NewUnit;
-
-    if (NewUnit.IsValid())
-    {
-        UE_LOG(LogTemp, Display, TEXT("OnCreateDelegates.Broadcast()"));
-        OnCreateDelegates.Broadcast();
-    }
+    OnCreateDelegates.Broadcast();
     CheckUnit();
 }
 
