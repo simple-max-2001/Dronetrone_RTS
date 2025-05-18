@@ -14,7 +14,9 @@ void ARTSGameState::ServerSetPause_Implementation(bool bPause)
 
 bool ARTSGameState::ServerSetPause_Validate(bool bPause)
 {
-    return true;
+    if (const UWorld* World = GetWorld()) return World->IsPaused() == bPause;
+
+    return false;
 }
 
 void ARTSGameState::BeginPlay()

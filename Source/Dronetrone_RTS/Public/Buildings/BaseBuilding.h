@@ -28,14 +28,18 @@ protected:
 	UBoxComponent* BoxComponent;
 
 public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	bool operator==(const ABaseBuilding& Other) const
+	{
+		return EntityComponent->GetEntityID() == Other.EntityComponent->GetEntityID();
+	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UEntityComponent* EntityComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	UHealthComponent* HealthComponent;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

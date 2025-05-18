@@ -59,6 +59,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	bool operator==(const ABaseUnit& Other) const
+	{
+		return EntityComponent->GetEntityID() == Other.EntityComponent->GetEntityID();
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UTexture2D* GetUnitIcon();
 

@@ -21,11 +21,13 @@ public:
 
     void UpdateEntities();
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
     TArray<TSoftObjectPtr<ABaseUnit>> GetAllUnits() const;
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)    
     TArray<TSoftObjectPtr<ABaseBuilding>> GetAllBuildings() const;
 
-    //UPROPERTY(ReplicatedUsing = OnRep_IsGamePaused)
+    UPROPERTY() // (ReplicatedUsing = OnRep_IsGamePaused)
     bool bIsGamePaused = false;
 
     UFUNCTION(BlueprintCallable, Server, Reliable, WithValidation)

@@ -10,6 +10,8 @@ UEntityComponent::UEntityComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	EntityID = FGuid::NewGuid();
 }
 
 
@@ -18,9 +20,10 @@ void UEntityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+
 	// Call blueprint event OnSpawnEntity
 	if (OnSpawnEntity.IsBound()) OnSpawnEntity.Broadcast();
-	
 }
 
 void UEntityComponent::KillEntity()
@@ -55,11 +58,6 @@ void UEntityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
-bool UEntityComponent::IsAlive() const
-{
-	return bIsAlive;
-}
-
 bool UEntityComponent::IsOwnedBy(int32 Owner_ID) const
 {
 	return GetRelation(Owner_ID) == ERelationType::Own;
@@ -80,14 +78,4 @@ ERelationType UEntityComponent::GetRelation(int32 Owner_ID) const
 	if (OwnerID == Owner_ID) return ERelationType::Own;
 
 	return ERelationType::Neutral;
-}
-
-float UEntityComponent::GetSelectionRadius() const
-{
-	return SelectionRadius;
-}
-
-int32 UEntityComponent::GetOwnerID() const
-{
-	return OwnerID;
 }

@@ -46,30 +46,53 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsAlive() const;
-
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Entity")
+	bool IsAlive() const
+	{
+		return bIsAlive;
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	bool IsOwnedBy(int32 Owner_ID) const;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	bool IsFriend(UEntityComponent* OtherEntity, bool bOwnerOnly = true) const;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
 	ERelationType GetRelation(int32 Owner_ID) const;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Selection")
-	float GetSelectionRadius() const;
-
+	float GetSelectionRadius() const
+	{
+		return SelectionRadius;
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Ownership")
-	int32 GetOwnerID() const;
+	int32 GetOwnerID() const
+	{
+		return OwnerID;
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Entity")
+	FGuid GetEntityID() const
+	{
+		return EntityID;
+	}
 
+	bool operator==(const UEntityComponent& Other) const
+	{
+		return EntityID == Other.EntityID;
+	}
+	
 protected:
 	bool bIsAlive = true;
 
 	UPROPERTY(EditInstanceOnly, Category = "Ownership")
 	int32 OwnerID = -1;
+
+	UPROPERTY(EditInstanceOnly, Category = "Ownership")
+	FGuid EntityID;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Selection")
 	float SelectionRadius = 128;
