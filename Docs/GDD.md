@@ -1,90 +1,195 @@
-# Game Design Document (GDD) for "Dronetrone: Tactical Ascension"
+# Game Design Document (GDD)
 
-## Overview
+## Dronetrone RTS — Alpha / MVP-based
 
-### Genre
-Real Time Strategy (RTS).
+---
 
-### Game modes
+## 1. Загальний огляд
 
-- Multiplayer (1 vs 1, 1 vs 1 vs 1, 2 vs 2);
+### 1.1. Назва проєкту
 
-- Campaigin with elements of survival simulation and moral dilemmas.
+**Dronetrone RTS** (робоча назва)
 
+### 1.2. Жанр
 
-## Core concept
+* Real-Time Strategy (RTS)
+* Systems-driven / Command & Control RTS
 
+### 1.3. Ключова ідея
 
-- **Main idea:** The use of automated drones in the theater of operations.
+Гравець керує підрозділами не напряму, а через систему радіозв’язку, яка може деградувати або повністю зникати через відстань і радіоелектронну боротьбу (РЕБ). Юніти здатні діяти автономно, але втрата зв’язку радикально змінює хід бою.
 
+### 1.4. Ціль платформи
 
-## Main features
+* PC (Windows)
 
-- Controlling units and buildings only when they have radiosignal.
+### 1.5. Цільова аудиторія
 
-- Units can have set of orders for execution.
+* гравці RTS середнього та високого рівня;
+* гравці, зацікавлені у тактичних і системних іграх;
+* дослідники та розробники AI (через API).
 
-## Story
+---
 
-### Climate Crisis and Mistake
+## 2. Дизайн-цілі
 
-In the 21st century, global warming reached a critical point: rising sea levels, devastating storms, droughts, and massive resource shortages led to socio-economic chaos. Desperate attempts to cool the planet led to the implementation of an ambitious initiative - the Stratospheric Shield program, which involved spraying aerosols in the upper atmosphere to block solar radiation.
+1. Зробити **зв’язок центральною ігровою механікою**, а не модифікатором.
+2. Забезпечити зрозумілий причинно-наслідковий геймплей без перевантаження реалізмом.
+3. Побудувати гру як **архітектурно модульну систему** (Core Engine + клієнт).
+4. Зберегти іграбельність навіть при втраті контролю.
 
-The program achieved initial success, but the effect was unpredictable. The reflection of sunlight, together with natural chain reactions (changes in ocean currents, expansion of ice sheets, increase in albedo), provoked a rapid drop in global temperatures. In less than a century, the Earth turned into an Ice Age, where snowstorms and permafrost made the surface uninhabitable.
+---
 
-### Human Survival and the Role of AI
+## 3. Основний геймплейний цикл
 
-Anticipating a catastrophe, governments and corporations created underground shelters protected from extreme conditions. Some factions, not wanting to be tied to one place, began to build "Wanderers" - autonomous mobile colonies capable of traveling across the ice-covered surface.
+1. Гравець оцінює ситуацію на полі бою.
+2. Віддає накази підрозділам через HQ.
+3. Core Engine перевіряє стан зв’язку.
+4. Команди виконуються, затримуються або ігноруються.
+5. Юніти діють автономно відповідно до FSM.
+6. Результати дій змінюють тактичну ситуацію.
 
-Due to the complexity of managing infrastructure, energy and defense, control over many aspects of survival was transferred to artificial intelligence algorithms (AI). They were responsible for:
+---
 
-- Extraction and distribution of resources.
-- Coordination of unmanned combat and technical vehicles (UCVs).
-- Ensuring the life of shelters.
+## 4. Світ і сетинг
 
-Several AIs have been given a similar mission - to ensure the survival of humanity after a global catastrophe. However, different approaches to solving the problem lead to serious disagreements and unintended consequences, becoming a source of conflict.
+### 4.1. Сетинг
 
-### Fractions
+Близьке майбутнє. Збройні конфлікти ведуться автономними наземними роботизованими комплексами (НРК) за активної протидії в електромагнітному спектрі.
 
-- **AI algorithm SAFE (Strategic Artificial intelligence for Fortress Engagement).** Responsible for protecting the static ground base of the underground storage facility. It is focused on restoring existing systems, conserving resources, and ensuring stability.
+### 4.2. Масштаб
 
-- **AI algorithm NOMAD (NOn-static Machine for Adaptive Defense).** Provides protection for a complex of "Wanderers". Initially, he used a classic defensive strategy, but over time he switched to an aggressive policy of "the best defense is offense." He believes that threats must be eliminated immediately.
+* Тактичний рівень;
+* Декілька десятків юнітів;
+* Одна карта = один бій.
 
-- **Order "Exstirpo".** Radical organization. Descendants of members of a former private military company who have deep prejudices against AI and autonomous systems. They believe that AI has caused the decline of civilization, and their mission is to completely eradicate the technologies they perceive as a threat.
+---
 
-- **Survivours.** Disparate groups with different views on how to rebuild humanity in the conditions of the Ice Age. They view their allies and enemies through the prism of survival, often acting in the interests of their own security, which leads to intense ideological confrontations. Despite their differences, their common goal is to find ways to preserve humanity and adapt to new living conditions.
+## 5. Юніти
 
-- **Crazy machines.** Disparate unmanned combat units groups or military bases, what have troubles in "friend-foe" identification 
+### 5.1. HQ (Командний пункт)
 
-## Campaigin 1. "Survival protocol"
+* Джерело управління;
+* Точка створення юнітів;
+* Нерухомий;
+* Знищення = поразка.
 
-### Description
+### 5.2. Бойовий НРК
 
-The player takes on the role of **S.A.F.E.** (Strategic AI for Fortress Engagement), an AI that operates a ground base near an underground bunker that is humanity's last refuge on the Ice Age. The AI's task is to defend the base, mine resources, produce drones, and organize an evacuation for the people if the bunker is attacked. When a threat from an enemy force arrives, the player must organize an effective defense, make critical security decisions, and ultimately evacuate, facing moral choices and unforeseen circumstances that call into question not only the safety of the people, but also the very essence of their survival.
+* Наземний;
+* Основна бойова одиниця;
+* Має автономну FSM;
+* Вразливий до втрати зв’язку.
 
-### Philosophical Context:
+### 5.3. НРК РЕБ
 
-Every decision has consequences - whether to maintain stability through defense or fight back against aggressive policies that have led to destruction. The player must face a moral dilemma, as both strategies can ensure survival, but the cost of each is different.
+* Створює зону глушіння;
+* Порушує канали зв’язку противника;
+* Висока стратегічна цінність.
 
-## Campaigin 2. "N.O.M.A.D. code"
+---
 
-### Description
+## 6. Система радіозв’язку
 
-In this campaign, the player takes on the role of **N.O.M.A.D.** (Non-static Optimized Machine for Adaptive Defense), a strategic AI that carries out its original mission of protecting the population through autonomous mobile complexes. After a severe attack on one of these complexes, the operator of the storage facility, due to tragic consequences, allows N.O.M.A.D. to take its own directives. It causes the evolution of AI, and N.O.M.A.D. adapts to new conditions that threaten not only its mission, but also all of humanity. The player, as part of this transformation, must struggle with how to act in the new conditions - whether to continue to follow the old directives, or adapt to new realities that pose a danger to everyone.
+### 6.1. Стани
 
-### Philosophical Context.
+* Connected
+* Degraded
+* NoSignal
 
-In the "N.O.M.A.D. Code" campaign, the player controls an AI that faces moral and strategic dilemmas, where the need to adapt to new realities clashes with the duty to maintain stability in extreme conditions. The AI is forced to decide whether to follow clear algorithms or reconsider its directives, which raises questions about the value of adaptation and evolution compared to old methods of protection. This leads to deeper philosophical reflections on the responsibility of AI for its choices, the value of human life in the face of global catastrophe, and whether artificial intelligence has the right to change its strategy in order to achieve its goal, even if it leads to unforeseen consequences for humanity.
+### 6.2. Вплив на геймплей
 
-### Unique mechanics
+* Зв’язок визначає можливість управління.
+* Втрата зв’язку не зупиняє юніт, але знижує контроль.
 
-- Control of path of 
+### 6.3. Зворотний зв’язок гравцю
 
+* Візуальні індикатори стану;
+* Повідомлення про відхилені команди.
 
-## Campaigin 3. ???
+---
 
-### Visual mechanics
+## 7. AI та автономна поведінка
 
-## Target platform and audience
+### 7.1. FSM юнітів
 
-## Timeline ???
+* Idle
+* MoveTo
+* AttackTarget
+* HoldPosition
+
+FSM працює завжди, незалежно від зв’язку.
+
+### 7.2. AI супротивника
+
+* Користується тими ж правилами;
+* Обмежений тими ж каналами зв’язку;
+* Орієнтований на демонстрацію механік.
+
+---
+
+## 8. Система ресурсів і виробництва
+
+### 8.1. Ресурси
+
+* Один умовний ресурс;
+* Фіксований стартовий обсяг;
+* Не відновлюється.
+
+### 8.2. Виробництво
+
+* Лише через HQ;
+* Обмежені ліміти;
+* Фіксована затримка спавну;
+* Списання ресурсу одразу.
+
+---
+
+## 9. Інтерфейс користувача (UI)
+
+* RTS-камера;
+* Виділення юнітів;
+* Індикатори стану зв’язку;
+* Панель ресурсів;
+* Повідомлення про помилки команд.
+
+---
+
+## 10. Перемога і поразка
+
+### 10.1. Перемога
+
+* Знищення HQ противника.
+
+### 10.2. Поразка
+
+* Втрата власного HQ;
+* Повна втрата керування всіма НРК.
+
+---
+
+## 11. Технічний дизайн (коротко)
+
+* Core Engine: C++, headless, tick-based;
+* Unreal Engine: клієнт;
+* Взаємодія через API (gRPC/REST);
+* Підтримка зовнішнього управління.
+
+---
+
+## 12. Ризики та обмеження
+
+* Перевантаження гравця складністю;
+* Пояснюваність втрати управління;
+* Баланс між автономністю та контролем.
+
+---
+
+## 13. Подальший розвиток
+
+* Повноцінна економіка;
+* Залежність виробництва від зв’язку;
+* Багаторівневий зв’язок (ретранслятори);
+* Кампанія;
+* Мультиплеєр;
+* Дослідницький режим.
