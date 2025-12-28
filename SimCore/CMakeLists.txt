@@ -1,7 +1,4 @@
-﻿# CMakeList.txt: проект CMake для SimCore; включите исходный код и определения,
-# укажите здесь логику для конкретного проекта.
-#
-cmake_minimum_required (VERSION 3.21)
+﻿cmake_minimum_required (VERSION 3.21)
 
 project (SimCore LANGUAGES CXX)
 
@@ -11,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(simcore SHARED
 	src/api/simcore_api.cpp
 	src/core/world.cpp
-)
+    src/core/entity.cpp)
 
 target_include_directories(simcore
 	PUBLIC
@@ -22,6 +19,6 @@ target_include_directories(simcore
 
 target_compile_definitions(simcore PRIVATE SIMCORE_EXPORT)
 
-add_executable (simcore_cli "cli/cli_main.cpp" )
+add_executable (simcore_cli "cli/cli_main.cpp")
 
 target_link_libraries(simcore_cli PRIVATE simcore)

@@ -12,6 +12,11 @@ int main()
         sim_tick(sim);
         const auto* ws = sim_get_world_snapshot(sim);
         std::cout << "Frame: " << ws->frame << "; Time: " << ws->time << " s; Entities count: " << ws->entitiesCount << "\n";
+
+        for (size_t i = 0; i < ws->entitiesCount; i++)
+        {
+            std::cout << "\tEntity #" << i << ": ID=" << ws->entities[i].id << "\n";
+        }
     }
 
     sim_destroy(sim);

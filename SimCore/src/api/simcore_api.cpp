@@ -48,8 +48,14 @@ public:
         worldSnapshot.frame = frame_;
 
         // ќтримуЇмо ≥нформац≥ю про к≥льк≥сть юн≥т≥в (поки що це випадкове число)
-        std::uniform_int_distribution<uint32_t> dist(0, 99);
-        worldSnapshot.entitiesCount = dist(rng);
+        const auto& entities = world_->getEntities();
+        worldSnapshot.entitiesCount = entities.size();
+
+        worldSnapshot.entities = new EntitySnapshot[worldSnapshot.entitiesCount];
+        for (size_t i = 0; i < worldSnapshot.entitiesCount; i++)
+        {
+            worldSnapshot.entities[i] = EntitySnapshot(entities.at(i).getEntityID());
+        }
     }
 
     const WorldSnapshot* sim_get_world_snapshot()
