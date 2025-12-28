@@ -43,17 +43,19 @@ public:
         frame_++;
         timestamp_ += fixedDelta_;
 
+        // -------- Оновлюємо снапшот світу --------
         // Отримуємо поточні фрейм та мітку часу
         worldSnapshot.time = timestamp_;
         worldSnapshot.frame = frame_;
 
-        // Отримуємо інформацію про кількість юнітів (поки що це випадкове число)
+        // Отримуємо інформацію про кількість юнітів
         const auto& entities = world_->getEntities();
         worldSnapshot.entitiesCount = entities.size();
 
         worldSnapshot.entities = new EntitySnapshot[worldSnapshot.entitiesCount];
         for (size_t i = 0; i < worldSnapshot.entitiesCount; i++)
         {
+            // Заповнюємо інформацію про кожен юніт у снапшоті
             worldSnapshot.entities[i] = EntitySnapshot(entities.at(i).getEntityID());
         }
     }
