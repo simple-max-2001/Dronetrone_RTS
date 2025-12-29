@@ -5,7 +5,7 @@ void World::tick(double dt)
 {
 	for (size_t i = 0; i < entities.size(); i++)
 	{
-		entities[i].tick();
+		entities[i].tick(dt);
 	}
 }
 
@@ -31,6 +31,11 @@ void World::destroyEntity(EntityId entityID)
 const std::vector<Entity>& World::getEntities() const
 {
 	return entities;
+}
+
+WorldState World::getWorldState() const
+{
+	return worldState_;
 }
 
 EntityId World::getEntityID()

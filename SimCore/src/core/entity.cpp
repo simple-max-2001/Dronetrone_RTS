@@ -6,7 +6,7 @@ Entity::Entity(EntityId entityID) : entityID_(entityID)
 
 }
 
-void Entity::tick()
+void Entity::tick(double dt)
 {
 
 }

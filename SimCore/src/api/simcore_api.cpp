@@ -34,6 +34,7 @@ public:
 
     void tick()
     {
+        // якщо св≥т не було створено, то н≥чого не робимо
         if (!world_) return;
 
         // –ух юн≥т≥в та оновленн€ св≥ту
@@ -47,6 +48,8 @@ public:
         // ќтримуЇмо поточн≥ фрейм та м≥тку часу
         worldSnapshot.time = timestamp_;
         worldSnapshot.frame = frame_;
+
+		worldSnapshot.worldState = world_->getWorldState();
 
         // ќтримуЇмо ≥нформац≥ю про к≥льк≥сть юн≥т≥в
         const auto& entities = world_->getEntities();

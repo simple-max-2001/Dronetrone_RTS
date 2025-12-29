@@ -7,7 +7,7 @@ class Entity
 public:
 	Entity(EntityId entityID);
 
-	void tick();
+	void tick(double dt);
 
 	EntityId getEntityID() const;
 
