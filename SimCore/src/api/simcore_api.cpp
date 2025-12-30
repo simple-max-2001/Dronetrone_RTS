@@ -7,7 +7,7 @@
 class SimCoreImpl
 {
 public:
-    SimCoreImpl(uint64_t seed = 42) : rng(seed)
+    SimCoreImpl(uint64_t seed = 42) : rng_(seed)
     {
     }
 
@@ -29,7 +29,7 @@ public:
         timestamp_ = 0;
         world_.reset();
 
-        worldSnapshot = WorldSnapshot();
+        worldSnapshot_ = WorldSnapshot();
     }
 
     void tick()
@@ -46,30 +46,30 @@ public:
 
         // -------- Оновлюємо снапшот світу --------
         // Отримуємо поточні фрейм та мітку часу
-        worldSnapshot.time = timestamp_;
-        worldSnapshot.frame = frame_;
+        worldSnapshot_.time = timestamp_;
+        worldSnapshot_.frame = frame_;
 
-		worldSnapshot.worldState = world_->getWorldState();
+		worldSnapshot_.worldState = world_->getWorldState();
 
         // Отримуємо інформацію про кількість юнітів
         const auto& entities = world_->getEntities();
-        worldSnapshot.entitiesCount = entities.size();
+        worldSnapshot_.entitiesCount = entities.size();
 
-        worldSnapshot.entities = new EntitySnapshot[worldSnapshot.entitiesCount];
-        for (size_t i = 0; i < worldSnapshot.entitiesCount; i++)
+        worldSnapshot_.entities = new EntitySnapshot[worldSnapshot_.entitiesCount];
+        for (size_t i = 0; i < worldSnapshot_.entitiesCount; i++)
         {
             // Заповнюємо інформацію про кожен юніт у снапшоті
-            worldSnapshot.entities[i] = EntitySnapshot(entities.at(i).getEntityID());
+            worldSnapshot_.entities[i] = EntitySnapshot(entities.at(i).getEntityID());
         }
     }
 
     const WorldSnapshot* sim_get_world_snapshot()
     {
-        return &worldSnapshot;
+        return &worldSnapshot_;
     }
 
 private:
-    std::mt19937_64 rng;
+    std::mt19937_64 rng_;
 
     uint64_t frame_ = 0;
     double timestamp_ = 0;
@@ -77,7 +77,7 @@ private:
     double fixedDelta_ = 0.02;
 
     std::unique_ptr<World> world_;
-    WorldSnapshot worldSnapshot{};
+    WorldSnapshot worldSnapshot_{};
 };
 
 SIMCORE_API SimHandle sim_create(uint64_t seed)

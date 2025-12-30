@@ -3,26 +3,31 @@
 
 void World::tick(double dt)
 {
-	for (size_t i = 0; i < entities.size(); i++)
+	if (worldState_ != WorldState::Running)
 	{
-		entities[i].tick(dt);
+		return;
+	}
+
+	for (size_t i = 0; i < entities_.size(); i++)
+	{
+		entities_[i].tick(dt);
 	}
 }
 
 EntityId World::spawnEntity()
 {
 	EntityId id = getEntityID();
-	entities.emplace_back(id);
+	entities_.emplace_back(id);
 	return id;
 }
 
 void World::destroyEntity(EntityId entityID)
 {
-	for (size_t i = 0; i < entities.size(); i++)
+	for (size_t i = 0; i < entities_.size(); i++)
 	{
-		if (entities[i].getEntityID() == entityID)
+		if (entities_[i].getEntityID() == entityID)
 		{
-			entities.erase(entities.begin() + i);
+			entities_.erase(entities_.begin() + i);
 			return;
 		}
 	}
@@ -30,7 +35,7 @@ void World::destroyEntity(EntityId entityID)
 
 const std::vector<Entity>& World::getEntities() const
 {
-	return entities;
+	return entities_;
 }
 
 WorldState World::getWorldState() const
@@ -40,5 +45,5 @@ WorldState World::getWorldState() const
 
 EntityId World::getEntityID()
 {
-	return nextEntityID++;
+	return nextEntityID_++;
 }

@@ -20,9 +20,9 @@ private:
 	EntityId getEntityID();
 
 private:
-	EntityId nextEntityID{};
+	EntityId nextEntityID_{};
 
 	WorldState worldState_{ WorldState::Running };
 
-	std::vector<Entity> entities{};
+	std::vector<Entity> entities_{};
 };
