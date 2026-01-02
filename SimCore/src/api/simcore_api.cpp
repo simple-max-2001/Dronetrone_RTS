@@ -21,6 +21,7 @@ public:
         stop();
 
         world_ = std::make_unique<World>();
+		world_->spawnUnit();
     }
 
     void stop()
@@ -59,7 +60,7 @@ public:
         for (size_t i = 0; i < worldSnapshot_.entitiesCount; i++)
         {
             // Заповнюємо інформацію про кожен юніт у снапшоті
-            worldSnapshot_.entities[i] = EntitySnapshot(entities.at(i).getEntityID());
+            worldSnapshot_.entities[i] = EntitySnapshot(entities[i]->getEntityID());
         }
     }
 

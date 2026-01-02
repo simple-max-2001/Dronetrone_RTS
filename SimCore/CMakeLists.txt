@@ -13,8 +13,13 @@ endif()
 add_library(simcore SHARED
 	src/api/simcore_types.cpp
 	src/api/simcore_api.cpp
+	src/core/components/component.cpp
+	src/core/components/health.cpp
+	src/core/units/unit.cpp
+    src/core/units/ugv.cpp
     src/core/entity.cpp
-	src/core/world.cpp)
+	src/core/world.cpp
+)
 
 set_target_properties(simcore PROPERTIES
     DEBUG_POSTFIX "d"
@@ -28,6 +33,8 @@ target_include_directories(simcore
 
 target_compile_definitions(simcore PRIVATE SIMCORE_EXPORT)
 
-add_executable (simcore_cli "cli/cli_main.cpp")
+add_executable (simcore_cli 
+				cli/cli_main.cpp
+)
 
 target_link_libraries(simcore_cli PRIVATE simcore)

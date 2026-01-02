@@ -2,6 +2,7 @@
 
 #include "core/entity.h"
 
+#include <memory>
 #include <vector>
 
 class World
@@ -9,10 +10,11 @@ class World
 public:
 	void tick(double dt);
 
-	EntityId spawnEntity();
+	EntityId spawnUnit();
+
 	void destroyEntity(EntityId entityID);
 
-	const std::vector<Entity>& getEntities() const;
+	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 
 	WorldState getWorldState() const;
 
@@ -24,5 +26,5 @@ private:
 
 	WorldState worldState_{ WorldState::Running };
 
-	std::vector<Entity> entities_{};
+	std::vector<std::unique_ptr<Entity>> entities_{};
 };

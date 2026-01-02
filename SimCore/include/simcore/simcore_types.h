@@ -16,18 +16,26 @@
 extern "C" {
 #endif
     using EntityId = uint64_t;
+
+    enum class EntityOwner : uint8_t
+    {
+        Neutral,
+        Player1,
+        Player2,
+        Player3,
+    };
     
-    enum class WorldState
+    enum class WorldState : uint8_t
     {
         Running,
         Team1Win,
         Team2Win,
-        Draw
+        Draw,
     };
 
     SIMCORE_TYPES const char* worldStateToString(WorldState state);
 
-	enum class EntityType
+	enum class EntityType : uint8_t
     {
         Unit,
         Building
