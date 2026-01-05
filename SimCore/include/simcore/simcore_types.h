@@ -25,6 +25,8 @@ extern "C" {
         Player3,
     };
 
+    SIMCORE_TYPES const char* entityOwnerToString(EntityOwner owner);
+    
     enum class EventType : uint8_t
     {
 		EntityNone,
@@ -54,9 +56,20 @@ extern "C" {
         Building
 	};
 
+    SIMCORE_TYPES const char* entityTypeToString(EntityType type);
+
+    struct Pose {
+		int32_t x;      // position at X in centimeters
+		int32_t y;      // position at Y in centimeters
+        int32_t yaw;    // yaw angle in degrees * 100 (0..360_00)
+    };
+
     struct EntitySnapshot
     {
         EntityId id{};
+		EntityType type{};
+		EntityOwner owner{};
+		Pose pose{};
     };
 
     struct WorldSnapshot

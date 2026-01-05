@@ -1,6 +1,7 @@
 #include "core/units/ugv.h"
 
-UGV::UGV(EntityId entityID, EntityOwner entityOwner) : Unit(entityID, entityOwner)
+UGV::UGV(World* world, EntityId entityID, EntityOwner entityOwner) :
+	Unit(world, entityID, entityOwner)
 {
 
 }

@@ -15,7 +15,9 @@ int main()
 
         for (size_t i = 0; i < ws->entitiesCount; i++)
         {
-            std::cout << "\tEntity #" << i << ": ID=" << ws->entities[i].id << "\n";
+			EntitySnapshot entity = ws->entities[i];
+			std::cout << "\tEntity #" << i << ": ID=" << entity.id << " Type: " << entityTypeToString(entity.type) << " Owner: " << entityOwnerToString(entity.owner)
+                << " X: " << entity.pose.x << " Y: " << entity.pose.y << " Yaw: " << entity.pose.yaw << "\n";
         }
 
         while (true)

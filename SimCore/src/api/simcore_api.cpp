@@ -73,10 +73,14 @@ public:
         for (size_t i = 0; i < worldSnapshot_.entitiesCount; i++)
         {
             // Заповнюємо інформацію про кожен юніт у снапшоті
-            worldSnapshot_.entities[i] = EntitySnapshot(entities[i]->getEntityID());
+			const Entity* entity = entities[i].get();
+            worldSnapshot_.entities[i] = EntitySnapshot{entity->getEntityID(),
+                                                        entity->getEntityType(),
+				                                        entity->getEntityOwner(),
+                                                        entity->getPose()};
         }
     }
-
+    
     const WorldSnapshot* sim_get_world_snapshot()
     {
         return &worldSnapshot_;

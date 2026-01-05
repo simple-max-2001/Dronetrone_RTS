@@ -5,7 +5,7 @@
 class UGV : public Unit
 {
 public:
-	UGV(EntityId entityID, EntityOwner entityOwner);
+	UGV(World* world, EntityId entityID, EntityOwner entityOwner);
 
 	virtual void tick(double dt) override;
 };

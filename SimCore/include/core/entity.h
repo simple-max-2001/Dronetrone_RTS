@@ -3,12 +3,19 @@
 #include "simcore_types.h"
 
 
+class World;
+
 class Entity
 {
 public:
-	Entity(EntityId entityID, 
+	Entity(World* world,
+		   EntityId entityID, 
 		   EntityType entityType,
 		   EntityOwner entityOwner = EntityOwner::Neutral);
+
+	~Entity() = default;
+
+	World* getWorld() const;
 
 	virtual void tick(double dt) = 0;
 
@@ -18,8 +25,16 @@ public:
 
 	EntityOwner getEntityOwner() const;
 
+	void setPose(const Pose& pose);
+
+	const Pose& getPose() const;
+
 private:
+	World* world_{};
+
 	EntityId entityID_;
 	EntityType entityType_;
 	EntityOwner entityOwner_;
+
+	Pose pose_{};
 };

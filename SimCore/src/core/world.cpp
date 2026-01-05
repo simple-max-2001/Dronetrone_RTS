@@ -18,7 +18,7 @@ void World::tick(double dt)
 EntityId World::spawnUnit()
 {
 	EntityId id = getEntityID();
-	auto ptr = std::make_unique<UGV>(id, EntityOwner::Player1);
+	auto ptr = std::make_unique<UGV>(this, id, EntityOwner::Player1);
 	entities_.emplace_back(std::move(ptr));
 
 	events_.push(Event{ EventType::EntityCreated, id });
