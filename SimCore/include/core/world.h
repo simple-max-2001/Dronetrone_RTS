@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 
 class World
 {
@@ -18,6 +19,8 @@ public:
 
 	WorldState getWorldState() const;
 
+	Event getEvent();
+
 private:
 	EntityId getEntityID();
 
@@ -27,4 +30,6 @@ private:
 	WorldState worldState_{ WorldState::Running };
 
 	std::vector<std::unique_ptr<Entity>> entities_{};
+
+	std::queue<Event> events_{};
 };

@@ -17,6 +17,16 @@ int main()
         {
             std::cout << "\tEntity #" << i << ": ID=" << ws->entities[i].id << "\n";
         }
+
+        while (true)
+        {
+            const auto* event = sim_get_event(sim);
+            if (event->type == EventType::EntityNone)
+            {
+                break;
+            }
+			std::cout << "\tEvent: Type=" << static_cast<int>(event->type) << "; Entity ID=" << event->id << "\n";
+        }
     }
 
     sim_destroy(sim);

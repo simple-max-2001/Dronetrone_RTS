@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/entity.h"
-
 #include "core/components/health.h"
 
 #include <memory>

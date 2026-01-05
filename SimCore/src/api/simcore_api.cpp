@@ -31,6 +31,7 @@ public:
         world_.reset();
 
         worldSnapshot_ = WorldSnapshot();
+		event_ = Event{};
     }
 
     void tick()
@@ -44,6 +45,18 @@ public:
         // Оновлення таймеру
         frame_++;
         timestamp_ += fixedDelta_;
+
+        // TEST: Spawn unit at frame 2
+        if (frame_ == 2)
+        {
+            world_->spawnUnit();
+		}
+
+		// TEST: Destroy unit at frame 4
+        if (frame_ == 4)
+        {
+            world_->destroyEntity(world_->getEntities()[0]->getEntityID());
+        }
 
         // -------- Оновлюємо снапшот світу --------
         // Отримуємо поточні фрейм та мітку часу
@@ -69,6 +82,14 @@ public:
         return &worldSnapshot_;
     }
 
+    const Event* sim_get_event()
+    {
+        if (world_)
+			event_ = world_->getEvent();
+
+        return &event_;
+	}
+
 private:
     std::mt19937_64 rng_;
 
@@ -78,7 +99,9 @@ private:
     double fixedDelta_ = 0.02;
 
     std::unique_ptr<World> world_;
+
     WorldSnapshot worldSnapshot_{};
+	Event event_{};
 };
 
 SIMCORE_API SimHandle sim_create(uint64_t seed)
@@ -104,4 +127,10 @@ SIMCORE_API const WorldSnapshot* sim_get_world_snapshot(SimHandle h)
 {
     auto* sim = static_cast<SimCoreImpl*>(h);
     return sim->sim_get_world_snapshot();
+}
+
+SIMCORE_API const Event* sim_get_event(SimHandle h)
+{
+    auto* sim = static_cast<SimCoreImpl*>(h);
+    return sim->sim_get_event();
 }

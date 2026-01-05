@@ -22,6 +22,7 @@ extern "C" {
     SIMCORE_API void sim_destroy(SimHandle);
     SIMCORE_API void sim_tick(SimHandle);
     SIMCORE_API const WorldSnapshot* sim_get_world_snapshot(SimHandle);
+	SIMCORE_API const Event* sim_get_event(SimHandle);
 
 #ifdef __cplusplus
 }

@@ -1,8 +1,9 @@
 #pragma once
 
+#include "component.h"
+
 #include <cstdint>
 
-#include "component.h"
 
 /*
  Armor type of entity. There are considered three types:

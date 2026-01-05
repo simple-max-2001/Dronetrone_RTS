@@ -13,11 +13,11 @@ endif()
 add_library(simcore SHARED
 	src/api/simcore_types.cpp
 	src/api/simcore_api.cpp
+    src/core/entity.cpp
 	src/core/components/component.cpp
 	src/core/components/health.cpp
 	src/core/units/unit.cpp
     src/core/units/ugv.cpp
-    src/core/entity.cpp
 	src/core/world.cpp
 )
 

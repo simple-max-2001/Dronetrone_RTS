@@ -24,6 +24,19 @@ extern "C" {
         Player2,
         Player3,
     };
+
+    enum class EventType : uint8_t
+    {
+		EntityNone,
+        EntityCreated,
+        EntityDestroyed,
+    };
+
+    struct Event
+    {
+        EventType type{};
+        EntityId id{};
+    };
     
     enum class WorldState : uint8_t
     {
