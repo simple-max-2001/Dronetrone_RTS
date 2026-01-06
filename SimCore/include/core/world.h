@@ -6,12 +6,16 @@
 #include <vector>
 #include <queue>
 
+
 class World
 {
 public:
+	World();
+
 	void tick(double dt);
 
-	EntityId spawnUnit();
+	template<typename T>
+	EntityId spawnEntity(EntityOwner owner);
 
 	void destroyEntity(EntityId entityID);
 
@@ -33,3 +37,15 @@ private:
 
 	std::queue<Event> events_{};
 };
+
+template<typename T>
+EntityId World::spawnEntity(EntityOwner owner)
+{
+	EntityId id = getEntityID();
+	auto ptr = std::make_unique<T>(this, id, owner);
+	entities_.emplace_back(std::move(ptr));
+
+	events_.push(Event{ EventType::EntityCreated, id });
+
+	return id;
+}

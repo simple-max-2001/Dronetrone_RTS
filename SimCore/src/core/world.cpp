@@ -1,6 +1,13 @@
 #include "core/world.h"
-#include "core/units/ugv.h"
 
+#include "core/buildings/hq.h"
+
+
+World::World()
+{
+	spawnEntity<HQ>(EntityOwner::Player1);
+	spawnEntity<HQ>(EntityOwner::Player2);
+}
 
 void World::tick(double dt)
 {
@@ -13,17 +20,6 @@ void World::tick(double dt)
 	{
 		entities_[i]->tick(dt);
 	}
-}
-
-EntityId World::spawnUnit()
-{
-	EntityId id = getEntityID();
-	auto ptr = std::make_unique<UGV>(this, id, EntityOwner::Player1);
-	entities_.emplace_back(std::move(ptr));
-
-	events_.push(Event{ EventType::EntityCreated, id });
-
-	return id;
 }
 
 void World::destroyEntity(EntityId entityID)

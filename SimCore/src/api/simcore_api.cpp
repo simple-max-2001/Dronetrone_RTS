@@ -1,8 +1,11 @@
 #include "simcore/simcore_api.h"
+
+#include "core/units/ugv.h"
 #include "core/world.h"
 
 #include <cstdint>
 #include <random>
+
 
 class SimCoreImpl
 {
@@ -21,7 +24,6 @@ public:
         stop();
 
         world_ = std::make_unique<World>();
-		world_->spawnUnit();
     }
 
     void stop()
@@ -49,13 +51,14 @@ public:
         // TEST: Spawn unit at frame 2
         if (frame_ == 2)
         {
-            world_->spawnUnit();
+            world_->spawnEntity<UGV>(EntityOwner::Player1);
+            world_->spawnEntity<UGV>(EntityOwner::Player2);
 		}
 
 		// TEST: Destroy unit at frame 4
         if (frame_ == 4)
         {
-            world_->destroyEntity(world_->getEntities()[0]->getEntityID());
+            world_->destroyEntity(world_->getEntities()[1]->getEntityID());
         }
 
         // -------- Оновлюємо снапшот світу --------

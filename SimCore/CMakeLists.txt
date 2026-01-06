@@ -18,6 +18,8 @@ add_library(simcore SHARED
 	src/core/components/health.cpp
 	src/core/units/unit.cpp
     src/core/units/ugv.cpp
+	src/core/buildings/building.cpp
+	src/core/buildings/hq.cpp
 	src/core/world.cpp
 )
 

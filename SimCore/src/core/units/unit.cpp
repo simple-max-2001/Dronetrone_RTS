@@ -1,5 +1,6 @@
 #include "core/units/unit.h"
 
+
 Unit::Unit(World* world, EntityId entityID, EntityOwner entityOwner) : 
 	Entity(world, entityID, EntityType::Unit, entityOwner)
 {

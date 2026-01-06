@@ -53,15 +53,15 @@ extern "C" {
 	enum class EntityType : uint8_t
     {
         Unit,
-        Building
+        Building,
 	};
 
     SIMCORE_TYPES const char* entityTypeToString(EntityType type);
 
     struct Pose {
-		int32_t x;      // position at X in centimeters
-		int32_t y;      // position at Y in centimeters
-        int32_t yaw;    // yaw angle in degrees * 100 (0..360_00)
+		int32_t x   = 0;    // position at X in centimeters
+		int32_t y   = 0;    // position at Y in centimeters
+        int32_t yaw = 0;    // yaw angle in degrees * 100 (0..360_00)
     };
 
     struct EntitySnapshot
