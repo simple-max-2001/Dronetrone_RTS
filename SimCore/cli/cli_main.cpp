@@ -29,6 +29,14 @@ int main()
             }
 			std::cout << "\tEvent: Type=" << static_cast<int>(event->type) << "; Entity ID=" << event->id << "\n";
         }
+
+		std::cout << "----------------------------------------\n\n";
+
+        if (ws->worldState != WorldState::Running)
+        {
+			std::cout << "Match ended with state: " << worldStateToString(ws->worldState) << '\n';
+            break;
+		}
     }
 
     sim_destroy(sim);

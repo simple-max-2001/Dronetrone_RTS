@@ -4,13 +4,12 @@
 #include "core/world.h"
 
 #include <cstdint>
-#include <random>
 
 
 class SimCoreImpl
 {
 public:
-    SimCoreImpl(uint64_t seed = 42) : rng_(seed)
+    SimCoreImpl()
     {
     }
 
@@ -23,7 +22,7 @@ public:
     {
         stop();
 
-        world_ = std::make_unique<World>();
+        world_ = std::make_unique<World>(WorldInfo{});
     }
 
     void stop()
@@ -51,8 +50,8 @@ public:
         // TEST: Spawn unit at frame 2
         if (frame_ == 2)
         {
-            world_->spawnEntity<UGV>(EntityOwner::Player1);
-            world_->spawnEntity<UGV>(EntityOwner::Player2);
+            world_->spawnEntity<UGV>(EntityOwner::Player1, Pose{});
+            world_->spawnEntity<UGV>(EntityOwner::Player2, Pose{});
 		}
 
 		// TEST: Destroy unit at frame 4
@@ -98,8 +97,6 @@ public:
 	}
 
 private:
-    std::mt19937_64 rng_;
-
     uint64_t frame_ = 0;
     double timestamp_ = 0;
 
@@ -111,9 +108,9 @@ private:
 	Event event_{};
 };
 
-SIMCORE_API SimHandle sim_create(uint64_t seed)
+SIMCORE_API SimHandle sim_create()
 {
-    auto* sim = new SimCoreImpl(seed);
+    auto* sim = new SimCoreImpl();
     sim->reset();
     return sim;
 }

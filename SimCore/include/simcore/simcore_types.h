@@ -23,6 +23,7 @@ extern "C" {
         Player1,
         Player2,
         Player3,
+        Player4,
     };
 
     SIMCORE_TYPES const char* entityOwnerToString(EntityOwner owner);
@@ -45,6 +46,7 @@ extern "C" {
         Running,
         Team1Win,
         Team2Win,
+        Team3Win,
         Draw,
     };
 
@@ -62,6 +64,31 @@ extern "C" {
 		int32_t x   = 0;    // position at X in centimeters
 		int32_t y   = 0;    // position at Y in centimeters
         int32_t yaw = 0;    // yaw angle in degrees * 100 (0..360_00)
+    };
+
+	enum class MatchMode : uint8_t
+    {
+		Deathmatch,
+        CapturePoints,
+		Scenario,
+	};
+
+    struct MapInfo
+    {
+		int32_t width  = 240'00; // width in centimeters
+		int32_t height = 240'00; // height in centimeters
+
+        const Pose* spawnPoints = new Pose[]{ { 20'00,  20'00,   0'00},
+                                              {190'00, 190'00, 180'00} };
+		size_t spawnPointsCount = 2;
+    };
+
+    struct WorldInfo
+    {
+		MatchMode matchMode{};
+		uint8_t maxPlayers = 2;
+		MapInfo mapInfo{};
+        uint64_t seed = 42;
     };
 
     struct EntitySnapshot

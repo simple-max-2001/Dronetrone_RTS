@@ -13,6 +13,8 @@ SIMCORE_TYPES const char* entityOwnerToString(EntityOwner owner)
         return "Player 2";
     case EntityOwner::Player3:
         return "Player 3";
+    case EntityOwner::Player4:
+        return "Player 4";
     default:
         break;
     }
@@ -28,6 +30,8 @@ SIMCORE_TYPES const char* worldStateToString(WorldState state)
         return "Team's 1 Win";
     case WorldState::Team2Win:
         return "Team's 2 Win";
+    case WorldState::Team3Win:
+        return "Team's 3 Win";
     case WorldState::Draw:
         return "Draw";
     default:
