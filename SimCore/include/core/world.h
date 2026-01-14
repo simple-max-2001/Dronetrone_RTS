@@ -5,7 +5,7 @@
 #include <memory>
 #include <queue>
 #include <random>
-#include <vector>
+#include <map>
 
 
 class World
@@ -16,18 +16,18 @@ public:
 	void tick(double dt);
 
 	template<typename T>
-	EntityId spawnEntity(EntityOwner owner, const Pose& pose);
+	EntityId spawnEntity(PlayerID owner, const Pose& pose);
 
 	void destroyEntity(EntityId entityID);
 
-	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
+	const std::map<EntityId, std::unique_ptr<Entity>>& getEntities() const;
 
-	WorldState getWorldState() const;
+	WorldStateType getWorldState() const;
 
 	Event getEvent();
 
 private:
-	WorldState checkWorldState();
+	WorldStateType checkWorldState();
 
 	EntityId getEntityID();
 
@@ -37,15 +37,15 @@ private:
 	EntityId nextEntityID_{};
 
 	WorldInfo worldInfo_{};
-	WorldState worldState_{ WorldState::Running };
+	WorldStateType worldState_{ WorldStateType::Running };
 
-	std::vector<std::unique_ptr<Entity>> entities_{};
+	std::map<EntityId, std::unique_ptr<Entity>> entities_{};
 
 	std::queue<Event> events_{};
 };
 
 template<typename T>
-EntityId World::spawnEntity(EntityOwner owner, const Pose& pose)
+EntityId World::spawnEntity(PlayerID owner, const Pose& pose)
 {
 	// Create entity with new ID
 	EntityId id = getEntityID();
@@ -55,7 +55,7 @@ EntityId World::spawnEntity(EntityOwner owner, const Pose& pose)
 	ptr->setPose(pose);
 
 	// Add to list of entities
-	entities_.emplace_back(std::move(ptr));
+	entities_.emplace(id, std::move(ptr));
 
 	// Add new event
 	events_.push(Event{ EventType::EntityCreated, id });

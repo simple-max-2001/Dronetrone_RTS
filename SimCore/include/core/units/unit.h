@@ -9,7 +9,7 @@
 class Unit : public Entity
 {
 public:
-	Unit(World* world, EntityId entityID, EntityOwner entityOwner);
+	Unit(World* world, EntityId entityID, PlayerID entityOwner);
 
 	HealthComponent* getHealthComponent();
 

@@ -1,38 +1,15 @@
 #include "simcore_types.h"
 
 
-SIMCORE_TYPES const char* entityOwnerToString(EntityOwner owner)
-{
-    switch (owner)
-    {
-    case EntityOwner::Neutral:
-        return "Neutral";
-    case EntityOwner::Player1:
-        return "Player 1";
-    case EntityOwner::Player2:
-        return "Player 2";
-    case EntityOwner::Player3:
-        return "Player 3";
-    case EntityOwner::Player4:
-        return "Player 4";
-    default:
-        break;
-    }
-}
-
-SIMCORE_TYPES const char* worldStateToString(WorldState state)
+SIMCORE_TYPES const char* worldStateTypeToString(WorldStateType state)
 {
     switch (state)
     {
-    case WorldState::Running:
+    case WorldStateType::Running:
         return "Running";
-    case WorldState::Team1Win:
-        return "Team's 1 Win";
-    case WorldState::Team2Win:
-        return "Team's 2 Win";
-    case WorldState::Team3Win:
-        return "Team's 3 Win";
-    case WorldState::Draw:
+    case WorldStateType::Win:
+        return "Win";
+    case WorldStateType::Draw:
         return "Draw";
     default:
         return "Unknown";

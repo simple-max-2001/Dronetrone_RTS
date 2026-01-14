@@ -11,7 +11,7 @@ public:
 	Entity(World* world,
 		   EntityId entityID, 
 		   EntityType entityType,
-		   EntityOwner entityOwner = EntityOwner::Neutral);
+		   PlayerID owner = NeutralPlayer);
 
 	~Entity() = default;
 
@@ -23,7 +23,7 @@ public:
 
 	EntityType getEntityType() const;
 
-	EntityOwner getEntityOwner() const;
+	PlayerID getOwner() const;
 
 	void setPose(const Pose& pose);
 
@@ -34,7 +34,7 @@ private:
 
 	EntityId entityID_;
 	EntityType entityType_;
-	EntityOwner entityOwner_;
+	PlayerID entityOwner_;
 
 	Pose pose_{};
 };

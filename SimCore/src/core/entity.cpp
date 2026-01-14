@@ -1,7 +1,7 @@
 #include "core/entity.h"
 
 
-Entity::Entity(World* world, EntityId entityID, EntityType entityType, EntityOwner entityOwner) :
+Entity::Entity(World* world, EntityId entityID, EntityType entityType, PlayerID entityOwner) :
 	world_(world), entityID_(entityID), entityType_(entityType), entityOwner_(entityOwner)
 {
 
@@ -22,7 +22,7 @@ EntityType Entity::getEntityType() const
 	return entityType_;
 }
 
-EntityOwner Entity::getEntityOwner() const
+PlayerID Entity::getOwner() const
 {
 	return entityOwner_;
 }

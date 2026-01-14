@@ -1,7 +1,7 @@
 #include "core/buildings/hq.h"
 
 
-HQ::HQ(World* world, EntityId entityID, EntityOwner entityOwner) :
+HQ::HQ(World* world, EntityId entityID, PlayerID entityOwner) :
 	Building(world, entityID, entityOwner)
 {
 }

@@ -18,7 +18,7 @@ extern "C" {
 
     typedef void* SimHandle;
 
-    SIMCORE_API SimHandle sim_create();
+    SIMCORE_API SimHandle sim_create(WorldInfo* = nullptr);
     SIMCORE_API void sim_destroy(SimHandle);
     SIMCORE_API void sim_tick(SimHandle);
     SIMCORE_API const WorldSnapshot* sim_get_world_snapshot(SimHandle);

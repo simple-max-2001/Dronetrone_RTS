@@ -1,7 +1,7 @@
 #include "core/buildings/building.h"
 
 
-Building::Building(World* world, EntityId entityID, EntityOwner entityOwner) :
+Building::Building(World* world, EntityId entityID, PlayerID entityOwner) :
 	Entity(world, entityID, EntityType::Building, entityOwner)
 {
 	healthComponent_ = std::make_unique<HealthComponent>();

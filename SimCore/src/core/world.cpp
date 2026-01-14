@@ -41,14 +41,14 @@ World::World(WorldInfo worldInfo) :
 		for (size_t i = 0; i < players; i++)
 		{
 			Pose pose = worldInfo_.mapInfo.spawnPoints[spawnPoseIdxs[i]];
-			spawnEntity<HQ>(EntityOwner::Player1, pose);
+			spawnEntity<HQ>(PlayerID(i + 1), pose);
 		}
 	}
 }
 
 void World::tick(double dt)
 {
-	if (worldState_ != WorldState::Running)
+	if (worldState_ != WorldStateType::Running)
 	{
 		return;
 	}
@@ -63,23 +63,19 @@ void World::tick(double dt)
 
 void World::destroyEntity(EntityId entityID)
 {
-	for (size_t i = 0; i < entities_.size(); i++)
+	if (entities_.find(entityID) != entities_.end())
 	{
-		if (entities_[i]->getEntityID() == entityID)
-		{
-			entities_.erase(entities_.begin() + i);
-			events_.push(Event{ EventType::EntityDestroyed, entityID });
-			return;
-		}
+		entities_.erase(entityID);
+		events_.push(Event{ EventType::EntityDestroyed, entityID });
 	}
 }
 
-const std::vector<std::unique_ptr<Entity>>& World::getEntities() const
+const std::map<EntityId, std::unique_ptr<Entity>>& World::getEntities() const
 {
 	return entities_;
 }
 
-WorldState World::getWorldState() const
+WorldStateType World::getWorldState() const
 {
 	return worldState_;
 }
@@ -99,7 +95,7 @@ Event World::getEvent()
 	return event;
 }
 
-WorldState World::checkWorldState()
+WorldStateType World::checkWorldState()
 {
 	// Check HQs and determine winner
 	// TODO: implement team distribution
@@ -114,19 +110,11 @@ WorldState World::checkWorldState()
 			if (!health->isAlive())
 			{
 				// HQ destroyed
-				if (building->getEntityOwner() == EntityOwner::Player1)
-				{
-					return WorldState::Team2Win;
-				}
-				else if (building->getEntityOwner() == EntityOwner::Player2)
-				{
-					return WorldState::Team1Win;
-				}
 			}
 		}
 	}
 
-	return WorldState::Running;
+	return WorldStateType::Running;
 }
 
 EntityId World::getEntityID()

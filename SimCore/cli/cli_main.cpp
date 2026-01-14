@@ -11,12 +11,12 @@ int main()
     {
         sim_tick(sim);
         const auto* ws = sim_get_world_snapshot(sim);
-        std::cout << "Frame: " << ws->frame << "; Time: " << ws->time << " s; State: " << worldStateToString(ws->worldState) << "; Entities count: " << ws->entitiesCount << "\n";
+        std::cout << "Frame: " << ws->frame << "; Time: " << ws->time << " s; State: " << worldStateTypeToString(ws->worldState) << "; Entities count: " << ws->entitiesCount << "\n";
 
         for (size_t i = 0; i < ws->entitiesCount; i++)
         {
 			EntitySnapshot entity = ws->entities[i];
-			std::cout << "\tEntity #" << i << ": ID=" << entity.id << " Type: " << entityTypeToString(entity.type) << " Owner: " << entityOwnerToString(entity.owner)
+			std::cout << "\tEntity #" << i << ": ID=" << entity.id << " Type: " << entityTypeToString(entity.type) << " Owner: " << entity.owner
                 << " X: " << entity.pose.x << " Y: " << entity.pose.y << " Yaw: " << entity.pose.yaw << "\n";
         }
 
@@ -32,9 +32,9 @@ int main()
 
 		std::cout << "----------------------------------------\n\n";
 
-        if (ws->worldState != WorldState::Running)
+        if (ws->worldState != WorldStateType::Running)
         {
-			std::cout << "Match ended with state: " << worldStateToString(ws->worldState) << '\n';
+			std::cout << "Match ended with state type: " << worldStateTypeToString(ws->worldState) << '\n';
             break;
 		}
     }

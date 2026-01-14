@@ -9,7 +9,7 @@
 class Building : public Entity
 {
 public:
-	Building(World* world, EntityId entityID, EntityOwner entityOwner);
+	Building(World* world, EntityId entityID, PlayerID entityOwner);
 
 	HealthComponent* getHealthComponent();
 

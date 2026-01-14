@@ -17,16 +17,16 @@ extern "C" {
 #endif
     using EntityId = uint64_t;
 
-    enum class EntityOwner : uint8_t
-    {
-        Neutral,
-        Player1,
-        Player2,
-        Player3,
-        Player4,
-    };
+	using PlayerID = uint8_t;
 
-    SIMCORE_TYPES const char* entityOwnerToString(EntityOwner owner);
+    // Some constant expressions for player ID
+    constexpr PlayerID NeutralPlayer = 0;
+    constexpr PlayerID Player1 = 1;
+    constexpr PlayerID Player2 = 2;
+    constexpr PlayerID Player3 = 3;
+    constexpr PlayerID Player4 = 4;
+
+    using TeamID = uint8_t;
     
     enum class EventType : uint8_t
     {
@@ -41,16 +41,20 @@ extern "C" {
         EntityId id{};
     };
     
-    enum class WorldState : uint8_t
+    enum class WorldStateType : uint8_t
     {
         Running,
-        Team1Win,
-        Team2Win,
-        Team3Win,
+        Win,
         Draw,
     };
 
-    SIMCORE_TYPES const char* worldStateToString(WorldState state);
+    struct WorldState
+    {
+        WorldStateType state{};
+        PlayerID winner{};
+	};
+
+    SIMCORE_TYPES const char* worldStateTypeToString(WorldStateType state);
 
 	enum class EntityType : uint8_t
     {
@@ -75,12 +79,11 @@ extern "C" {
 
     struct MapInfo
     {
-		int32_t width  = 240'00; // width in centimeters
-		int32_t height = 240'00; // height in centimeters
+		int32_t width;  // width in centimeters
+		int32_t height; // height in centimeters
 
-        const Pose* spawnPoints = new Pose[]{ { 20'00,  20'00,   0'00},
-                                              {190'00, 190'00, 180'00} };
-		size_t spawnPointsCount = 2;
+        const Pose* spawnPoints;
+		size_t spawnPointsCount;
     };
 
     struct WorldInfo
@@ -95,7 +98,7 @@ extern "C" {
     {
         EntityId id{};
 		EntityType type{};
-		EntityOwner owner{};
+        PlayerID owner{};
 		Pose pose{};
     };
 
@@ -104,7 +107,8 @@ extern "C" {
         uint64_t frame = 0;
         double time = 0;
 
-		WorldState worldState = WorldState::Running;
+		WorldStateType worldState = WorldStateType::Running;
+        TeamID teamWinner{};
 
         size_t entitiesCount = 0;
         EntitySnapshot* entities = nullptr;

@@ -9,8 +9,25 @@
 class SimCoreImpl
 {
 public:
-    SimCoreImpl()
+    SimCoreImpl(WorldInfo* wi)
     {
+        worldInfo_ = wi ? *wi : WorldInfo
+        {
+            .matchMode  = MatchMode::Deathmatch,
+            .maxPlayers = 2,
+            .mapInfo    = MapInfo
+            {
+                .width  = 250'00,
+                .height = 250'00,
+                .spawnPoints = new Pose[]
+                {
+                    Pose{
+                        
+                    }
+                }
+            },
+            .seed       = 42,
+        };
     }
 
     ~SimCoreImpl()
@@ -37,49 +54,52 @@ public:
 
     void tick()
     {
-        // Якщо світ не було створено, то нічого не робимо
+        // If world wasn't created, do nothing
         if (!world_) return;
 
-        // Рух юнітів та оновлення світу
+        // Update world
         world_->tick(fixedDelta_);
 
-        // Оновлення таймеру
+        // Update timers
         frame_++;
         timestamp_ += fixedDelta_;
 
         // TEST: Spawn unit at frame 2
         if (frame_ == 2)
         {
-            world_->spawnEntity<UGV>(EntityOwner::Player1, Pose{});
-            world_->spawnEntity<UGV>(EntityOwner::Player2, Pose{});
+            world_->spawnEntity<UGV>(Player1, Pose{});
+            world_->spawnEntity<UGV>(Player2, Pose{});
 		}
 
 		// TEST: Destroy unit at frame 4
         if (frame_ == 4)
         {
-            world_->destroyEntity(world_->getEntities()[1]->getEntityID());
+            world_->destroyEntity(world_->getEntities().at(1)->getEntityID());
         }
 
-        // -------- Оновлюємо снапшот світу --------
-        // Отримуємо поточні фрейм та мітку часу
+        // -------- Update world's snapshot --------
+        // Get current timestamp and frame id
         worldSnapshot_.time = timestamp_;
         worldSnapshot_.frame = frame_;
 
 		worldSnapshot_.worldState = world_->getWorldState();
 
-        // Отримуємо інформацію про кількість юнітів
+        // Make entities snapshots
         const auto& entities = world_->getEntities();
         worldSnapshot_.entitiesCount = entities.size();
 
         worldSnapshot_.entities = new EntitySnapshot[worldSnapshot_.entitiesCount];
-        for (size_t i = 0; i < worldSnapshot_.entitiesCount; i++)
+        size_t i = 0;
+        for (const auto& pair : entities)
         {
-            // Заповнюємо інформацію про кожен юніт у снапшоті
-			const Entity* entity = entities[i].get();
-            worldSnapshot_.entities[i] = EntitySnapshot{entity->getEntityID(),
-                                                        entity->getEntityType(),
-				                                        entity->getEntityOwner(),
-                                                        entity->getPose()};
+            // Write inforamtion to entity snapshot
+			const Entity* entity = pair.second.get();
+            worldSnapshot_.entities[i++] = EntitySnapshot{
+                .id    = entity->getEntityID(),
+                .type  = entity->getEntityType(),
+				.owner = entity->getOwner(),
+                .pose  = entity->getPose()
+            };
         }
     }
     
@@ -103,14 +123,15 @@ private:
     double fixedDelta_ = 0.02;
 
     std::unique_ptr<World> world_;
+    WorldInfo worldInfo_;
 
     WorldSnapshot worldSnapshot_{};
 	Event event_{};
 };
 
-SIMCORE_API SimHandle sim_create()
+SIMCORE_API SimHandle sim_create(WorldInfo* wi)
 {
-    auto* sim = new SimCoreImpl();
+    auto* sim = new SimCoreImpl(wi);
     sim->reset();
     return sim;
 }
